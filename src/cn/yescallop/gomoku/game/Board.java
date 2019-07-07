@@ -16,7 +16,7 @@ public class Board {
     public static final int DIRECTION_DOWN_LEFT = 7;
 
     /**
-     * {x, y} delta for each direction
+     * {x, y} delta for each direction.
      */
     private static final int[][] ADJ_DELTA = {
             {1, 0}, {-1, 0}, {0, 1}, {0, -1},
@@ -24,7 +24,7 @@ public class Board {
     };
 
     /**
-     * The matrix of the board
+     * The matrix of the board.
      * <p>
      * Real board:
      * A2, B2
@@ -37,11 +37,9 @@ public class Board {
      * [[B1], [A1, B2], [A2]]
      */
     private final Grid[][] matrix = new Grid[15][15];
-//    private Grid[][] matrixLeftTilted;
-//    private Grid[][] matrixRightTilted;
 
     /**
-     * The current move index
+     * The current move index.
      */
     private int curMoveIndex;
 
@@ -66,64 +64,32 @@ public class Board {
                 }
             }
         }
+    }
 
-//        // Tilts the matrix, which seems not necessary
-//        matrixLeftTilted = new Grid[29][];
-//        for (int i = 0; i < 29; i++) {
-//            int x, y, len;
-//            if (i < 15) {
-//                x = 0;
-//                y = i;
-//                len = i + 1;
-//            } else {
-//                x = i - 14;
-//                y = 14;
-//                len = 29 - i;
-//            }
-//
-//            matrixLeftTilted[i] = new Grid[len];
-//            for (int j = 0; j < len; j++) {
-//                matrixLeftTilted[i][j] = matrix[y][x];
-//                x++;
-//                y--;
-//            }
-//        }
-//
-//        matrixRightTilted = new Grid[29][];
-//        for (int i = 0; i < 29; i++) {
-//            int x, y, len;
-//            if (i < 15) {
-//                x = 14 - i;
-//                y = 0;
-//                len = i + 1;
-//            } else {
-//                x = 0;
-//                y = i - 14;
-//                len = 29 - i;
-//            }
-//
-//            matrixRightTilted[i] = new Grid[len];
-//            for (int j = 0; j < len; j++) {
-//                matrixRightTilted[i][j] = matrix[y][x];
-//                x++;
-//                y++;
-//            }
-//        }
+    /**
+     * Gets the current move index.
+     */
+    public int currentMoveIndex() {
+        return curMoveIndex;
+    }
+
+    public Grid getGrid(int x, int y) {
+        if (x < 0 || x > 15 || y < 0 || y > 15)
+            throw new IndexOutOfBoundsException("Out of board");
+        return matrix[y][x];
     }
 
     /**
      * Makes a move.
      *
-     * @param grid The grid where the move is made
-     * @param side The side which requested the move
-     * @return Whether the move is applied
+     * @param grid the grid where the move is made.
+     * @param side the side which requested the move.
      */
-    boolean move(Grid grid, Side side) {
+    void move(Grid grid, Side side) {
         if (grid.side != null)
-            return false;
+            throw new IllegalOperationException("Moving into an occupied grid");
         grid.side = side;
         grid.moveIndex = ++curMoveIndex;
-        return true;
     }
 
     /**
@@ -138,7 +104,7 @@ public class Board {
          * An array holding the adjacent grid instances,
          * which is initialized in the constructor and should never be modified.
          * <p>
-         * The mapping from indexes to directions can be found in the class <code>Board</code> as integer constants.
+         * The mapping from indexes to directions can be found in the class Board as integer constants.
          */
         private final Grid[] adjacentGrids = new Grid[8];
 
@@ -148,9 +114,9 @@ public class Board {
         private Side side = null;
 
         /**
-         * The move index of this grid starting from 0, -1 if unoccupied.
+         * The move index of this grid starting from 1, 0 if unoccupied.
          */
-        private int moveIndex = -1;
+        private int moveIndex = 0;
 
         private Grid(int x, int y) {
             this.x = x;
@@ -167,6 +133,10 @@ public class Board {
 
         public Side side() {
             return side;
+        }
+
+        public boolean isOccupied() {
+            return side != null;
         }
 
         public int moveIndex() {
