@@ -15,26 +15,38 @@ public class Game {
     private final Rule rule;
     private final int timeLimitPerMove; //TODO
     private final RuleController ruleController = new RuleController();
+    private final boolean hasPlayerHandler;
+
     private GlobalHandler globalHandler;
+
     private PlayerHandler firstPlayerHandler;
     private PlayerHandler secondPlayerHandler;
+
     private boolean started;
     private boolean ended;
     private boolean swapped = false;
-    private Side currentSide = Side.BLACK;
-    private Side sideAwaitingChoice = null;
     private boolean requestingForDraw = false;
 
+    private Side currentSide = Side.BLACK;
+    private Side sideAwaitingChoice = null;
+
+    private Choice[] choices = null;
+
     private Game(Builder builder) {
+        if (builder.rule == null)
+            throw new NullPointerException("Rule");
         this.rule = builder.rule;
         this.timeLimitPerMove = builder.timeLimitPerMove;
 
-        if (builder.globalHandler == null) {
+        hasPlayerHandler = builder.firstPlayerHandler != null && builder.secondPlayerHandler != null;
+        if (hasPlayerHandler) {
             this.firstPlayerHandler = builder.firstPlayerHandler;
             this.secondPlayerHandler = builder.secondPlayerHandler;
-        } else {
-            this.globalHandler = builder.globalHandler;
+        } else if (builder.globalHandler == null) {
+            throw new NullPointerException("Handler");
         }
+
+        this.globalHandler = builder.globalHandler;
 
         board = new Board();
     }
@@ -49,13 +61,14 @@ public class Game {
 
         rule.gameStarted(this, ruleController);
 
-        if (globalHandler == null) {
+        if (hasPlayerHandler) {
             firstPlayerHandler.gameStarted(this, new PlayerController(true), Side.BLACK);
             secondPlayerHandler.gameStarted(this, new PlayerController(false), Side.WHITE);
-
             firstPlayerHandler.moveRequested(0);
-        } else {
-            globalHandler.gameStarted(this, new GlobalController());
+        }
+
+        if (globalHandler != null) {
+            globalHandler.gameStarted(this, hasPlayerHandler ? null : new GlobalController());
             globalHandler.moveRequested(Side.BLACK);
         }
     }
@@ -90,7 +103,7 @@ public class Game {
     /**
      * Gets the rule type.
      *
-     * @return the type of the rule..
+     * @return the type of the rule.
      */
     public Rule.Type ruleType() {
         return rule.type();
@@ -99,7 +112,7 @@ public class Game {
     /**
      * Gets the rule name.
      *
-     * @return the name of the rule..
+     * @return the name of the rule.
      */
     public String ruleName() {
         return rule.name();
@@ -131,6 +144,14 @@ public class Game {
 
     public boolean isSwapped() {
         return swapped;
+    }
+
+    private void choiceMade(Choice choice, Side side) {
+        if (hasPlayerHandler)
+            player(side.opposite()).opponentChoiceMade(choice);
+
+        if (globalHandler != null)
+            globalHandler.choiceMade(choice, side);
     }
 
     public static class Builder {
@@ -203,13 +224,6 @@ public class Game {
          * @return a Game.
          */
         public Game build() {
-            if (rule == null)
-                throw new NullPointerException("Rule");
-
-            if (globalHandler == null) {
-                if (firstPlayerHandler == null || secondPlayerHandler == null)
-                    throw new NullPointerException("Handler");
-            }
             return new Game(this);
         }
     }
@@ -239,15 +253,22 @@ public class Game {
         /**
          * Makes a choice.
          *
-         * @param choice the choice.
+         * @param i the choice index.
          * @throws IllegalOperationException if the choice is illegal.
          */
-        public void makeChoice(Choice choice) {
+        public void makeChoice(int i) {
             if (sideAwaitingChoice == null)
                 throw new IllegalOperationException("No choice is requested");
 
+            if (i < 0 || i >= choices.length)
+                throw new IndexOutOfBoundsException("Choice index");
+            Choice choice = choices[i];
+
+            choiceMade(choice, sideAwaitingChoice);
             rule.processChoice(choice, sideAwaitingChoice);
+
             sideAwaitingChoice = null;
+            choices = null;
         }
 
         /**
@@ -256,9 +277,7 @@ public class Game {
          * @param result the result of the game.
          */
         public void end(Result result) {
-            ended = true;
-            started = false;
-            globalHandler.gameEnded(result);
+            ruleController.end(result);
         }
     }
 
@@ -304,17 +323,22 @@ public class Game {
         /**
          * Makes a choice.
          *
-         * @param choice the choice.
+         * @param i the choice index.
          * @throws IllegalOperationException if the choice is illegal.
          */
-        public void makeChoice(Choice choice) {
+        public void makeChoice(int i) {
             if (sideAwaitingChoice == null)
                 throw new IllegalOperationException("No choice is requested");
 
             Side side = side();
             if (sideAwaitingChoice != side)
                 throw new IllegalOperationException("Making opponent's choice");
-            PlayerHandler opponent = player(side.opposite());
+
+            if (i < 0 || i >= choices.length)
+                throw new IndexOutOfBoundsException("Choice index");
+
+            Choice choice = choices[i];
+            choiceMade(choice, side);
 
             if (requestingForDraw) {
                 switch (choice) {
@@ -322,19 +346,19 @@ public class Game {
                         ruleController.end(new Result(Result.Type.DRAW, null));
                         break;
                     case DECLINE_DRAW:
-                        opponent.opponentChoiceMade(choice);
+                        player(side).moveRequested(currentMoveIndex() + 1);
                         break;
-                    default:
-                        throw new IllegalOperationException("No such choice");
                 }
                 requestingForDraw = false;
+                sideAwaitingChoice = null;
+                choices = null;
                 return;
             }
 
             rule.processChoice(choice, side);
-            opponent.opponentChoiceMade(choice);
 
             sideAwaitingChoice = null;
+            choices = null;
         }
 
         /**
@@ -345,17 +369,14 @@ public class Game {
             if (side != currentSide)
                 throw new IllegalOperationException("Requesting for draw inopportunely");
 
-            requestingForDraw = true;
             ruleController.requestChoice(new Choice[]{Choice.ACCEPT_DRAW, Choice.DECLINE_DRAW}, side.opposite());
+            requestingForDraw = true;
         }
 
         /**
          * Quits the game.
          */
         public void quit() {
-            ended = true;
-            started = false;
-
             ruleController.end(new Result(Result.Type.QUIT, side().opposite()));
         }
     }
@@ -375,12 +396,13 @@ public class Game {
         public void swap() {
             swapped = !swapped;
 
-            if (globalHandler == null) {
+            if (hasPlayerHandler) {
                 firstPlayerHandler.sideSwapped();
                 secondPlayerHandler.sideSwapped();
-            } else {
-                globalHandler.sideSwapped();
             }
+
+            if (globalHandler != null)
+                globalHandler.sideSwapped();
         }
 
         /**
@@ -408,22 +430,22 @@ public class Game {
         public void makeMove(Board.Grid grid, Side side) {
             board.move(grid, side);
 
-            if (globalHandler == null) {
+            if (hasPlayerHandler)
                 player(side.opposite()).opponentMoveMade(grid);
-            } else {
+
+            if (globalHandler != null)
                 globalHandler.moveMade(grid);
-            }
         }
 
         /**
          * Requests the next move
          */
         public void requestNextMove() {
-            if (globalHandler == null) {
+            if (hasPlayerHandler)
                 currentPlayer().moveRequested(currentMoveIndex() + 1);
-            } else {
+
+            if (globalHandler != null)
                 globalHandler.moveRequested(currentSide);
-            }
         }
 
         /**
@@ -433,13 +455,17 @@ public class Game {
          * @param side    the side.
          */
         public void requestChoice(Choice[] choices, Side side) {
-            sideAwaitingChoice = side;
+            if (sideAwaitingChoice != null)
+                throw new IllegalOperationException("Duplicate choice request");
 
-            if (globalHandler == null) {
+            sideAwaitingChoice = side;
+            Game.this.choices = choices;
+
+            if (hasPlayerHandler)
                 player(side).choiceRequested(currentMoveIndex(), choices);
-            } else {
+
+            if (globalHandler != null)
                 globalHandler.choiceRequested(choices, side);
-            }
         }
 
         /**
@@ -451,12 +477,13 @@ public class Game {
             ended = true;
             started = false;
 
-            if (globalHandler == null) {
+            if (hasPlayerHandler) {
                 firstPlayerHandler.gameEnded(result);
                 secondPlayerHandler.gameEnded(result);
-            } else {
-                globalHandler.gameEnded(result);
             }
+
+            if (globalHandler != null)
+                globalHandler.gameEnded(result);
         }
     }
 }

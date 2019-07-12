@@ -73,6 +73,13 @@ public class Board {
         return curMoveIndex;
     }
 
+    /**
+     * Gets a grid.
+     *
+     * @param x the x coordinate.
+     * @param y the y coordinate.
+     * @return the specified Grid instance+.
+     */
     public Grid getGrid(int x, int y) {
         if (x < 0 || x > 15 || y < 0 || y > 15)
             throw new IndexOutOfBoundsException("Out of board");

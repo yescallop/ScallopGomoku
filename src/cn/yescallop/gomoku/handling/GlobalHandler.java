@@ -7,22 +7,16 @@ import cn.yescallop.gomoku.game.*;
  *
  * @author Scallop Ye
  */
-public abstract class GlobalHandler {
-
-    protected Game game;
-    protected Game.GlobalController controller;
+public interface GlobalHandler {
 
     /**
      * Called when the game is started.
      * This method must not be blocking.
      *
      * @param game       the game.
-     * @param controller the player controller.
+     * @param controller the global controller, null if player handlers exist.
      */
-    public void gameStarted(Game game, Game.GlobalController controller) {
-        this.game = game;
-        this.controller = controller;
-    }
+    void gameStarted(Game game, Game.GlobalController controller);
 
     /**
      * Called when a move is requested.
@@ -30,7 +24,7 @@ public abstract class GlobalHandler {
      *
      * @param side the side requested to move.
      */
-    public abstract void moveRequested(Side side);
+    void moveRequested(Side side);
 
     /**
      * Called when a move is made.
@@ -38,7 +32,7 @@ public abstract class GlobalHandler {
      *
      * @param move the move.
      */
-    public abstract void moveMade(Board.Grid move);
+    void moveMade(Board.Grid move);
 
     /**
      * Called when a choice is requested.
@@ -47,7 +41,7 @@ public abstract class GlobalHandler {
      * @param choices the choices to choose from.
      * @param side    the side.
      */
-    public abstract void choiceRequested(Choice[] choices, Side side);
+    void choiceRequested(Choice[] choices, Side side);
 
     /**
      * Called when a choice is made.
@@ -56,13 +50,13 @@ public abstract class GlobalHandler {
      * @param choice the move.
      * @param side   the side.
      */
-    public abstract void choiceMade(Choice choice, Side side);
+    void choiceMade(Choice choice, Side side);
 
     /**
      * Called when the sides are swapped.
      * This method must not be blocking.
      */
-    public abstract void sideSwapped();
+    void sideSwapped();
 
     /**
      * Called when the game ends.
@@ -70,5 +64,5 @@ public abstract class GlobalHandler {
      *
      * @param result the result of the game.
      */
-    public abstract void gameEnded(Result result);
+    void gameEnded(Result result);
 }
