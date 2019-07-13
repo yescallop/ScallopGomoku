@@ -11,7 +11,7 @@ public class NoLimit extends Rule {
 
     @Override
     public void processMove(Board.Grid grid, Side side) {
-        controller.makeMove(grid, side);
+        controller.makeMove(grid);
         controller.switchSide();
         controller.requestNextMove();
     }
@@ -24,10 +24,5 @@ public class NoLimit extends Rule {
     @Override
     public Type type() {
         return Type.NO_LIMIT;
-    }
-
-    @Override
-    public String name() {
-        return "No Limit";
     }
 }

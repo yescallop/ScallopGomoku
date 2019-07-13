@@ -1,22 +1,26 @@
-package cn.yescallop.gomoku.handling;
+package cn.yescallop.gomoku.event;
 
-import cn.yescallop.gomoku.game.*;
+import cn.yescallop.gomoku.game.Board;
+import cn.yescallop.gomoku.game.Choice;
+import cn.yescallop.gomoku.game.Result;
+import cn.yescallop.gomoku.game.Side;
+import cn.yescallop.gomoku.rule.Rule;
 
 /**
- * A global game handler.
+ * A game listener.
  *
  * @author Scallop Ye
  */
-public interface GlobalHandler {
+public interface GameListener {
 
     /**
      * Called when the game is started.
      * This method must not be blocking.
      *
-     * @param game       the game.
-     * @param controller the global controller, null if player handlers exist.
+     * @param board    The board of the game.
+     * @param ruleType The rule type of the game.
      */
-    void gameStarted(Game game, Game.GlobalController controller);
+    void gameStarted(Board board, Rule.Type ruleType);
 
     /**
      * Called when a move is requested.
@@ -31,8 +35,9 @@ public interface GlobalHandler {
      * This method must not be blocking.
      *
      * @param move the move.
+     * @param side the side.
      */
-    void moveMade(Board.Grid move);
+    void moveMade(Board.Grid move, Side side);
 
     /**
      * Called when a choice is requested.
@@ -53,16 +58,17 @@ public interface GlobalHandler {
     void choiceMade(Choice choice, Side side);
 
     /**
-     * Called when the sides are swapped.
+     * Called when the stones are swapped.
      * This method must not be blocking.
      */
-    void sideSwapped();
+    void stoneSwapped();
 
     /**
      * Called when the game ends.
      * This method must not be blocking.
      *
-     * @param result the result of the game.
+     * @param result      the result of the game.
+     * @param winningSide the winning side.
      */
-    void gameEnded(Result result);
+    void gameEnded(Result result, Side winningSide);
 }

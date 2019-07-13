@@ -3,13 +3,13 @@ package cn.yescallop.gomoku.game;
 /**
  * @author Scallop Ye
  */
-public enum Side {
+public enum StoneType {
 
-    FIRST("First"), SECOND("Second");
+    BLACK("Black"), WHITE("White");
 
     private final String name;
 
-    Side(String name) {
+    StoneType(String name) {
         this.name = name;
     }
 
@@ -18,7 +18,7 @@ public enum Side {
         return name;
     }
 
-    public Side opposite() {
-        return this == FIRST ? SECOND : FIRST;
+    public StoneType opposite() {
+        return this == BLACK ? WHITE : BLACK;
     }
 }

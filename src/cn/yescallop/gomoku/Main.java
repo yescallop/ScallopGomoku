@@ -3,7 +3,7 @@ package cn.yescallop.gomoku;
 /**
  * @author Scallop Ye
  */
-public class Gomoku {
+public class Main {
 
     public static void main(String[] args) {
         //TODO

@@ -42,15 +42,18 @@ public abstract class Rule {
      */
     public abstract Type type();
 
-    /**
-     * Get the name of the rule.
-     *
-     * @return the name of the rule.
-     */
-    public abstract String name();
-
     public enum Type {
-        NO_LIMIT,
-        NONSTANDARD
+        NO_LIMIT("No Limit");
+
+        private final String name;
+
+        Type(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

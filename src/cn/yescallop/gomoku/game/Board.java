@@ -78,7 +78,7 @@ public class Board {
      *
      * @param x the x coordinate.
      * @param y the y coordinate.
-     * @return the specified Grid instance+.
+     * @return the specified Grid instance.
      */
     public Grid getGrid(int x, int y) {
         if (x < 0 || x > 15 || y < 0 || y > 15)
@@ -89,19 +89,19 @@ public class Board {
     /**
      * Makes a move.
      *
-     * @param grid the grid where the move is made.
-     * @param side the side which requested the move.
+     * @param grid  the grid where the move is made.
+     * @param stone the stone type.
      */
-    void move(Grid grid, Side side) {
-        if (grid.side != null)
+    void move(Grid grid, StoneType stone) {
+        if (grid.stone != null)
             throw new IllegalOperationException("Moving into an occupied grid");
-        grid.side = side;
+        grid.stone = stone;
         grid.moveIndex = ++curMoveIndex;
     }
 
     /**
      * A grid instance holding its coordinate,
-     * side type, move index and the adjacent grid instances.
+     * stone type, move index and the adjacent grid instances.
      */
     public class Grid {
 
@@ -116,9 +116,9 @@ public class Board {
         private final Grid[] adjacentGrids = new Grid[8];
 
         /**
-         * The side of this grid, null if unoccupied.
+         * The stone of this grid, null if unoccupied.
          */
-        private Side side = null;
+        private StoneType stone = null;
 
         /**
          * The move index of this grid starting from 1, 0 if unoccupied.
@@ -138,12 +138,12 @@ public class Board {
             return y;
         }
 
-        public Side side() {
-            return side;
+        public StoneType stone() {
+            return stone;
         }
 
         public boolean isOccupied() {
-            return side != null;
+            return stone != null;
         }
 
         public int moveIndex() {
@@ -156,7 +156,7 @@ public class Board {
 
         @Override
         public String toString() {
-            return "Grid{" + x + ", " + y + ", " + side + "}";
+            return "Grid{" + x + ", " + y + ", " + stone + "}";
         }
     }
 }
