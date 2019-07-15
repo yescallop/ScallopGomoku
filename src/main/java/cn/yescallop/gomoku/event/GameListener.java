@@ -12,7 +12,7 @@ public interface GameListener {
     /**
      * Called when the game is started.
      *
-     * @param settings The settings of the game.
+     * @param settings the settings of the game.
      */
     void gameStarted(Game.Settings settings);
 

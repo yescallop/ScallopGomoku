@@ -6,6 +6,7 @@ import cn.yescallop.gomoku.rule.Rule;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Declares a game.
@@ -61,8 +62,10 @@ public class Game {
 
     /**
      * Starts the game.
+     *
+     * @return the future of this Game when it's ended.
      */
-    public void start() {
+    public GameFuture start() {
         if (started || ended)
             throw new IllegalStateException("Illegal start");
         started = true;
@@ -73,6 +76,8 @@ public class Game {
 
         gameThread = new GameThread(this);
         gameThread.start();
+
+        return new GameFuture();
     }
 
     /**
@@ -113,6 +118,13 @@ public class Game {
     public Side sideByStoneType(StoneType stone) {
         boolean black = stone == StoneType.BLACK;
         return (black ^ swapped) ? Side.FIRST : Side.SECOND;
+    }
+
+    /**
+     * Interrupts the game.
+     */
+    public void interrupt() {
+        gameThread.interrupt();
     }
 
     /**
@@ -250,7 +262,7 @@ public class Game {
          * Sets the game timeout.
          *
          * @param timeout the game timeout, 0 for no timeout.
-         * @param unit    the time unit of the timeout argument
+         * @param unit    the time unit of the timeout argument.
          * @return this builder.
          */
         public Builder gameTimeout(long timeout, TimeUnit unit) {
@@ -264,7 +276,7 @@ public class Game {
          * Sets the move timeout.
          *
          * @param timeout the move timeout, 0 for no timeout.
-         * @param unit    the time unit of the timeout argument
+         * @param unit    the time unit of the timeout argument.
          * @return this builder.
          */
         public Builder moveTimeout(long timeout, TimeUnit unit) {
@@ -285,6 +297,41 @@ public class Game {
     }
 
     // Non-static inner classes
+
+    /**
+     * The future of the game.
+     */
+    public class GameFuture {
+
+        private GameFuture() {
+        }
+
+        /**
+         * Waits for the game to end and gets the game.
+         *
+         * @return the ended game.
+         * @throws InterruptedException if the current thread was interrupted while waiting.
+         */
+        public Game get() throws InterruptedException {
+            gameThread.join();
+            return Game.this;
+        }
+
+        /**
+         * Waits for at most the given time for the game to end and gets the game.
+         *
+         * @param timeout the maximum time to wait.
+         * @param unit    the time unit of the timeout argument.
+         * @return the ended game.
+         * @throws InterruptedException if the current thread was interrupted while waiting.
+         * @throws TimeoutException     if the wait timed out.
+         */
+        public Game get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+            unit.timedJoin(gameThread, timeout);
+            if (gameThread.isAlive()) throw new TimeoutException();
+            return Game.this;
+        }
+    }
 
     public class Settings {
         private Settings() {
@@ -317,7 +364,7 @@ public class Game {
         }
 
         /**
-         * Swaps the black player and the white player.
+         * Swaps control of the stones.
          */
         public void swap() {
             swapped = !swapped;
@@ -393,7 +440,6 @@ public class Game {
             awaitingChoice = false;
             choiceSet = null;
             currentSide = null;
-            gameThread.interrupt();
             result = new Result(resultType, winningSide);
             listenerGroup.gameEnded(result);
         }

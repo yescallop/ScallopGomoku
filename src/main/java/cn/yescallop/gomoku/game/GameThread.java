@@ -3,6 +3,8 @@ package cn.yescallop.gomoku.game;
 import java.util.concurrent.*;
 
 /**
+ * The game thread.
+ *
  * @author Scallop Ye
  */
 class GameThread extends Thread {
@@ -43,6 +45,8 @@ class GameThread extends Thread {
                 game.listenerGroup().exceptionCaught(e);
             }
         }
+        if (!game.isEnded())
+            game.controller().end(Result.Type.INTERRUPT, null);
     }
 
     private void requestMove(Side side)
@@ -75,7 +79,7 @@ class GameThread extends Thread {
         game.rule().processChoice(choice, side);
     }
 
-    private Long sideTimeout(Side side) {
+    private long sideTimeout(Side side) {
         if (timeRemaining == null)
             return moveTimeout;
         long tr = timeRemaining[side.index()];

@@ -42,7 +42,9 @@ public class Board {
     private int curMoveIndex = 0;
 
     /**
-     * Creates a standard 15x15 gomoku board.
+     * Creates a gomoku board.
+     *
+     * @param size the size of the board.
      */
     Board(int size) {
         this.size = size;

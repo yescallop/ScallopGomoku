@@ -2,7 +2,7 @@ package cn.yescallop.gomoku.game;
 
 /**
  * A ChoiceSet represents a set of choices,
- * consisting of general choices, moves or a integer range.
+ * consisting of general choices, moves or an integer range.
  *
  * @author Scallop Ye
  */
@@ -39,12 +39,15 @@ public class ChoiceSet {
     }
 
     public boolean validate(int choice) {
-        if (choices != null) // General choices
-            return choice >= 0 && choice < choices.length;
-        if (moves != null) // Moves
-            return choice >= 0 && choice < moves.length;
-        // Number range
-        return choice >= range[0] && choice <= range[1];
+        switch (type) {
+            case GENERAL:
+                return choice >= 0 && choice < choices.length;
+            case MOVES:
+                return choice >= 0 && choice < moves.length;
+            case RANGE:
+                return choice >= range[0] && choice <= range[1];
+        }
+        return false;
     }
 
     public Type type() {

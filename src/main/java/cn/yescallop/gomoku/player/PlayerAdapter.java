@@ -5,6 +5,8 @@ import cn.yescallop.gomoku.game.Game;
 import cn.yescallop.gomoku.game.Result;
 
 /**
+ * An adapter class for Player
+ *
  * @author Scallop Ye
  */
 public abstract class PlayerAdapter extends Player {

@@ -15,7 +15,7 @@ public abstract class Player implements GameListener {
     private Side side = null;
 
     /**
-     * Sets the side of this listener.
+     * Sets the side of this player.
      * Side can only be set once.
      *
      * @param side the side.
@@ -82,7 +82,7 @@ public abstract class Player implements GameListener {
     protected abstract void multipleMovesRequested(int count);
 
     /**
-     * Called when a move is made by the opponent.
+     * Called when the opponent makes a move.
      *
      * @param move the move made.
      */

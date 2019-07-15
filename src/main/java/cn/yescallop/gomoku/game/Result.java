@@ -28,7 +28,8 @@ public class Result {
         FORBIDDEN_MOVE_MADE("A forbidden move was made"),
         TIMEOUT("Timeout"),
         EXCEPTION("Exception occurred"),
-        QUIT("Player quitting"),
+        INTERRUPT("Interrupted"),
+        QUIT("Player quitted"),
         DRAW_REQUEST_ACCEPTED("Draw request has been accepted");
 
         private final String description;
