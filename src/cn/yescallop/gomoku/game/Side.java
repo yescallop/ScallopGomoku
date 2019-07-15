@@ -5,20 +5,19 @@ package cn.yescallop.gomoku.game;
  */
 public enum Side {
 
-    FIRST("First"), SECOND("Second");
+    FIRST(0), SECOND(1);
 
-    private final String name;
+    private final int index;
 
-    Side(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    Side(int index) {
+        this.index = index;
     }
 
     public Side opposite() {
         return this == FIRST ? SECOND : FIRST;
+    }
+
+    public int index() {
+        return index;
     }
 }

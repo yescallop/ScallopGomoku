@@ -1,25 +1,44 @@
 package cn.yescallop.gomoku.game;
 
 /**
- * An enum indicating the result of a game.
+ * A Result indicates the result of a game.
  *
  * @author Scallop Ye
  */
-public enum Result {
+public class Result {
 
-    CHAIN_COMPLETED("A chain has been completed"),
-    FORBIDDEN_MOVE_MADE("A forbidden move was made"),
-    TIME_LIMIT_EXCEEDED("The time limit has been exceeded"),
-    QUIT("Player quitting"),
-    DRAW("Draw request has been accepted");
+    private final Type type;
+    private final Side winningSide;
 
-    private final String description;
-
-    Result(String description) {
-        this.description = description;
+    public Result(Type type, Side winningSide) {
+        this.type = type;
+        this.winningSide = winningSide;
     }
 
-    public String description() {
-        return description;
+    public Type type() {
+        return type;
+    }
+
+    public Side winningSide() {
+        return winningSide;
+    }
+
+    public enum Type {
+        CHAIN_COMPLETED("A chain has been completed"),
+        FORBIDDEN_MOVE_MADE("A forbidden move was made"),
+        TIMEOUT("Timeout"),
+        EXCEPTION("Exception occurred"),
+        QUIT("Player quitting"),
+        DRAW_REQUEST_ACCEPTED("Draw request has been accepted");
+
+        private final String description;
+
+        Type(String description) {
+            this.description = description;
+        }
+
+        public String description() {
+            return description;
+        }
     }
 }

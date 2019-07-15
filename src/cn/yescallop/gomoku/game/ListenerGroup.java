@@ -1,20 +1,19 @@
 package cn.yescallop.gomoku.game;
 
 import cn.yescallop.gomoku.event.GameListener;
-import cn.yescallop.gomoku.rule.Rule;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 
 /**
  * A ListenerGroup holds several listeners.
  *
  * @author Scallop Ye
  */
-class ListenerGroup extends LinkedHashSet<GameListener> implements GameListener {
+class ListenerGroup extends HashSet<GameListener> implements GameListener {
 
     @Override
-    public void gameStarted(Board board, Rule.Type ruleType) {
-        forEach(l -> l.gameStarted(board, ruleType));
+    public void gameStarted(Game.Settings settings) {
+        forEach(l -> l.gameStarted(settings));
     }
 
     @Override
@@ -23,17 +22,22 @@ class ListenerGroup extends LinkedHashSet<GameListener> implements GameListener 
     }
 
     @Override
+    public void multipleMovesRequested(int count, Side side) {
+        forEach(l -> l.multipleMovesRequested(count, side));
+    }
+
+    @Override
     public void moveMade(Board.Grid move, Side side) {
         forEach(l -> l.moveMade(move, side));
     }
 
     @Override
-    public void choiceRequested(Choice[] choices, Side side) {
-        forEach(l -> l.choiceRequested(choices, side));
+    public void choiceRequested(ChoiceSet choiceSet, Side side) {
+        forEach(l -> l.choiceRequested(choiceSet, side));
     }
 
     @Override
-    public void choiceMade(Choice choice, Side side) {
+    public void choiceMade(int choice, Side side) {
         forEach(l -> l.choiceMade(choice, side));
     }
 
@@ -43,7 +47,12 @@ class ListenerGroup extends LinkedHashSet<GameListener> implements GameListener 
     }
 
     @Override
-    public void gameEnded(Result result, Side winningSide) {
-        forEach(l -> l.gameEnded(result, winningSide));
+    public void gameEnded(Result result) {
+        forEach(l -> l.gameEnded(result));
+    }
+
+    @Override
+    public void exceptionCaught(Throwable t) {
+        forEach(l -> l.exceptionCaught(t));
     }
 }

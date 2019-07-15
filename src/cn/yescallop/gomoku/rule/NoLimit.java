@@ -1,7 +1,6 @@
 package cn.yescallop.gomoku.rule;
 
 import cn.yescallop.gomoku.game.Board;
-import cn.yescallop.gomoku.game.Choice;
 import cn.yescallop.gomoku.game.Side;
 
 /**
@@ -13,12 +12,10 @@ public class NoLimit extends Rule {
     public void processMove(Board.Grid grid, Side side) {
         controller.makeMove(grid);
         controller.switchSide();
-        controller.requestNextMove();
     }
 
     @Override
-    public void processChoice(Choice choice, Side side) {
-
+    public void processChoice(int choice, Side side) {
     }
 
     @Override

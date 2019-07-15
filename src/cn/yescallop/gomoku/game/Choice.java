@@ -9,9 +9,7 @@ public enum Choice {
 
     CHOOSE_BLACK("Choose black"),
     CHOOSE_WHITE("Choose white"),
-    CONTINUE("Continue"),
-    ACCEPT_DRAW("Accept the draw request"),
-    DECLINE_DRAW("Decline the draw request");
+    CONTINUE("Continue");
 
     private final String description;
 

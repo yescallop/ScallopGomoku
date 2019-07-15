@@ -1,6 +1,9 @@
 package cn.yescallop.gomoku.rule;
 
-import cn.yescallop.gomoku.game.*;
+import cn.yescallop.gomoku.game.Board;
+import cn.yescallop.gomoku.game.Game;
+import cn.yescallop.gomoku.game.IllegalMoveException;
+import cn.yescallop.gomoku.game.Side;
 
 /**
  * A Rule processes every move of the game.
@@ -10,9 +13,9 @@ import cn.yescallop.gomoku.game.*;
 public abstract class Rule {
 
     protected Game game;
-    protected Game.RuleController controller;
+    protected Game.Controller controller;
 
-    public void gameStarted(Game game, Game.RuleController controller) {
+    public void gameStarted(Game game, Game.Controller controller) {
         this.game = game;
         this.controller = controller;
     }
@@ -22,18 +25,17 @@ public abstract class Rule {
      *
      * @param grid the grid where the move is made.
      * @param side the side of the move.
-     * @throws RuleViolationException if the move violates the rule.
+     * @throws IllegalMoveException if the move is illegal.
      */
-    public abstract void processMove(Board.Grid grid, Side side) throws RuleViolationException;
+    public abstract void processMove(Board.Grid grid, Side side) throws IllegalMoveException;
 
     /**
      * Processes a choice made by the player.
      *
      * @param choice the choice made by the player.
      * @param side   the side of the choice.
-     * @throws IllegalOperationException if the choice is illegal.
      */
-    public abstract void processChoice(Choice choice, Side side);
+    public abstract void processChoice(int choice, Side side);
 
     /**
      * Get the type of the rule.

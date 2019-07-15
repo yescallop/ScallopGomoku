@@ -23,6 +23,8 @@ public class Board {
             {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
     };
 
+    private final int size;
+
     /**
      * The matrix of the board.
      * <p>
@@ -31,35 +33,34 @@ public class Board {
      * A1, B1
      * matrix:
      * [[A1, B1], [A2, B2]]
-     * matrixLeftTilted:
-     * [[A1], [A2, B1], [B2]]
-     * matrixRightTilted:
-     * [[B1], [A1, B2], [A2]]
      */
-    private final Grid[][] matrix = new Grid[15][15];
+    private final Grid[][] matrix;
 
     /**
      * The current move index.
      */
-    private int curMoveIndex;
+    private int curMoveIndex = 0;
 
     /**
      * Creates a standard 15x15 gomoku board.
      */
-    Board() {
-        for (int y = 0; y < 15; y++) {
-            for (int x = 0; x < 15; x++) {
+    Board(int size) {
+        this.size = size;
+        matrix = new Grid[size][size];
+
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
                 matrix[y][x] = new Grid(x, y);
             }
         }
 
         // Fills the adjacent grids
-        for (int y = 0; y < 15; y++) {
-            for (int x = 0; x < 15; x++) {
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
                 for (int i = 0; i < 8; i++) {
                     int adjX = x + ADJ_DELTA[i][0];
                     int adjY = y + ADJ_DELTA[i][1];
-                    if (adjX >= 0 && adjX < 15 && adjY >= 0 && adjY < 15)
+                    if (adjX >= 0 && adjX < size && adjY >= 0 && adjY < size)
                         matrix[y][x].adjacentGrids[i] = matrix[adjY][adjX];
                 }
             }
@@ -67,7 +68,18 @@ public class Board {
     }
 
     /**
+     * Gets the size of the board.
+     *
+     * @return the size.
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
      * Gets the current move index.
+     *
+     * @return the current move index.
      */
     public int currentMoveIndex() {
         return curMoveIndex;
@@ -81,8 +93,6 @@ public class Board {
      * @return the specified Grid instance.
      */
     public Grid getGrid(int x, int y) {
-        if (x < 0 || x > 15 || y < 0 || y > 15)
-            throw new IndexOutOfBoundsException("Out of board");
         return matrix[y][x];
     }
 
@@ -93,8 +103,6 @@ public class Board {
      * @param stone the stone type.
      */
     void move(Grid grid, StoneType stone) {
-        if (grid.stone != null)
-            throw new IllegalOperationException("Moving into an occupied grid");
         grid.stone = stone;
         grid.moveIndex = ++curMoveIndex;
     }

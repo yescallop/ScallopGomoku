@@ -1,10 +1,6 @@
 package cn.yescallop.gomoku.event;
 
-import cn.yescallop.gomoku.game.Board;
-import cn.yescallop.gomoku.game.Choice;
-import cn.yescallop.gomoku.game.Result;
-import cn.yescallop.gomoku.game.Side;
-import cn.yescallop.gomoku.rule.Rule;
+import cn.yescallop.gomoku.game.*;
 
 /**
  * A game listener.
@@ -15,24 +11,28 @@ public interface GameListener {
 
     /**
      * Called when the game is started.
-     * This method must not be blocking.
      *
-     * @param board    The board of the game.
-     * @param ruleType The rule type of the game.
+     * @param settings The settings of the game.
      */
-    void gameStarted(Board board, Rule.Type ruleType);
+    void gameStarted(Game.Settings settings);
 
     /**
      * Called when a move is requested.
-     * This method must not be blocking.
      *
      * @param side the side requested to move.
      */
     void moveRequested(Side side);
 
     /**
+     * Called when multiple moves are requested.
+     * TODO: Implements multiple moves
+     *
+     * @param side the side requested to move.
+     */
+    void multipleMovesRequested(int count, Side side);
+
+    /**
      * Called when a move is made.
-     * This method must not be blocking.
      *
      * @param move the move.
      * @param side the side.
@@ -41,34 +41,36 @@ public interface GameListener {
 
     /**
      * Called when a choice is requested.
-     * This method must not be blocking.
      *
-     * @param choices the choices to choose from.
-     * @param side    the side.
+     * @param choiceSet the choice set.
+     * @param side      the side.
      */
-    void choiceRequested(Choice[] choices, Side side);
+    void choiceRequested(ChoiceSet choiceSet, Side side);
 
     /**
      * Called when a choice is made.
-     * This method must not be blocking.
      *
-     * @param choice the move.
+     * @param choice the choice.
      * @param side   the side.
      */
-    void choiceMade(Choice choice, Side side);
+    void choiceMade(int choice, Side side);
 
     /**
      * Called when the stones are swapped.
-     * This method must not be blocking.
      */
     void stoneSwapped();
 
     /**
      * Called when the game ends.
-     * This method must not be blocking.
      *
-     * @param result      the result of the game.
-     * @param winningSide the winning side.
+     * @param result the result of the game.
      */
-    void gameEnded(Result result, Side winningSide);
+    void gameEnded(Result result);
+
+    /**
+     * Called when an exception is caught.
+     *
+     * @param t the exception.
+     */
+    void exceptionCaught(Throwable t);
 }
