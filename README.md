@@ -1,4 +1,4 @@
-# ScallopGomoku
+# scallop-gomoku
 
 A gomoku library written in Java.
 
