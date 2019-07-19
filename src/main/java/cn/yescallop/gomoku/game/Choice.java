@@ -1,7 +1,7 @@
 package cn.yescallop.gomoku.game;
 
 /**
- * Declares a choice.
+ * A Choice is a choice.
  *
  * @author Scallop Ye
  */

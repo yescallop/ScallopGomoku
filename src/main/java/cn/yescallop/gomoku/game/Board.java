@@ -1,6 +1,8 @@
 package cn.yescallop.gomoku.game;
 
 /**
+ * A Board consists of the Grid matrix.
+ *
  * @author Scallop Ye
  */
 public class Board {
@@ -98,6 +100,10 @@ public class Board {
         return matrix[y][x];
     }
 
+    public Grid getGrid(Point p) {
+        return matrix[p.y][p.x];
+    }
+
     /**
      * Makes a move.
      *
@@ -110,10 +116,10 @@ public class Board {
     }
 
     /**
-     * A grid instance holding its coordinate,
+     * A Grid holds its coordinate,
      * stone type, move index and the adjacent grid instances.
      */
-    public class Grid {
+    public static class Grid {
 
         private final int x, y;
 
@@ -148,6 +154,10 @@ public class Board {
             return y;
         }
 
+        public Point point() {
+            return new Point(x, y);
+        }
+
         public StoneType stone() {
             return stone;
         }
@@ -167,6 +177,41 @@ public class Board {
         @Override
         public String toString() {
             return "Grid{" + x + ", " + y + ", " + stone + "}";
+        }
+    }
+
+    public static class Point {
+
+        private final int x, y;
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public static Point parse(String s) {
+            if (s.length() < 2)
+                throw new IllegalArgumentException();
+            char first = s.charAt(0);
+            char second = s.charAt(1);
+            if (first < 'A' || first > 'Z' || second < '1' || second > '9')
+                throw new IllegalArgumentException();
+            int x = first - 'A';
+            int y = Integer.parseInt(s.substring(1));
+            return new Point(x, y);
+        }
+
+        public int x() {
+            return x;
+        }
+
+        public int y() {
+            return y;
+        }
+
+        @Override
+        public String toString() {
+            return new String(new char[]{(char) ('A' + x), (char) ('1' + y)});
         }
     }
 }

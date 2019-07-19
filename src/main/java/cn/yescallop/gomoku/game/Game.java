@@ -4,99 +4,45 @@ import cn.yescallop.gomoku.event.GameListener;
 import cn.yescallop.gomoku.player.Player;
 import cn.yescallop.gomoku.rule.Rule;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Declares a game.
+ * A Game is a game.
  *
  * @author Scallop Ye
  */
-public class Game {
+public interface Game {
 
-    private final Board board;
-    private final Rule rule;
-    private final long gameTimeout;
-    private final long moveTimeout;
-
-    private final Controller controller = new Controller();
-
-    private final ListenerGroup listenerGroup;
-
-    private final Player[] players;
-
-    private GameThread gameThread;
-
-    private boolean started;
-    private boolean ended;
-    private boolean swapped = false;
-
-    private boolean awaitingChoice = false;
-    private ChoiceSet choiceSet = null;
-
-    private Side currentSide = Side.FIRST;
-
-    private Result result = null;
-
-    private Game(Builder builder) {
-        this.rule = Objects.requireNonNull(builder.rule);
-
-        this.players = builder.players;
-        // Sets the sides of the players
-        players[0].setSide(Side.FIRST);
-        players[1].setSide(Side.SECOND);
-
-        this.gameTimeout = builder.gameTimeout;
-        this.moveTimeout = builder.moveTimeout;
-
-        this.listenerGroup = builder.listenerGroup;
-        // Adds players to the listener group
-        listenerGroup.add(players[0]);
-        listenerGroup.add(players[1]);
-
-        board = new Board(15);
+    /**
+     * Creates a new builder of Game.
+     *
+     * @return the builder.
+     */
+    static Game.Builder newBuilder() {
+        return new GameBuilderImpl();
     }
-
-    // Public methods
 
     /**
      * Starts the game.
      *
-     * @return the future of this Game when it's ended.
+     * @return the future of this Game.
      */
-    public GameFuture start() {
-        if (started || ended)
-            throw new IllegalStateException("Illegal start");
-        started = true;
-
-        rule.gameStarted(this, controller);
-
-        listenerGroup.gameStarted(new Settings());
-
-        gameThread = new GameThread(this);
-        gameThread.start();
-
-        return new GameFuture();
-    }
+    Game.Future start();
 
     /**
      * Gets the current side of turn.
      *
      * @return the current side.
      */
-    public Side currentSide() {
-        return currentSide;
-    }
+    Side currentSide();
 
     /**
      * Gets the current stone type of turn.
      *
      * @return the current stone type.
      */
-    public StoneType currentStoneType() {
-        return stoneTypeBySide(currentSide);
-    }
+    StoneType currentStoneType();
 
     /**
      * Gets the stone type by the side.
@@ -104,10 +50,7 @@ public class Game {
      * @param side the side.
      * @return the stone type.
      */
-    public StoneType stoneTypeBySide(Side side) {
-        boolean first = side == Side.FIRST;
-        return (first ^ swapped) ? StoneType.BLACK : StoneType.WHITE;
-    }
+    StoneType stoneTypeBySide(Side side);
 
     /**
      * Gets the side by the stone type.
@@ -115,125 +58,90 @@ public class Game {
      * @param stone the stone type.
      * @return the side.
      */
-    public Side sideByStoneType(StoneType stone) {
-        boolean black = stone == StoneType.BLACK;
-        return (black ^ swapped) ? Side.FIRST : Side.SECOND;
-    }
-
-    /**
-     * Interrupts the game.
-     */
-    public void interrupt() {
-        gameThread.interrupt();
-    }
+    Side sideByStoneType(StoneType stone);
 
     /**
      * Gets the result of the game.
      *
-     * @return the result of the game.
+     * @return the result of this game, null if not ended.
      */
-    public Result result() {
-        return result;
-    }
+    Result result();
 
     /**
      * Gets the board.
      *
      * @return the board of this game.
      */
-    public Board board() {
-        return board;
-    }
+    Board board();
 
     /**
      * Gets the game timeout.
      *
      * @return the game timeout.
      */
-    public long gameTimeout() {
-        return gameTimeout;
-    }
+    long gameTimeout();
 
     /**
      * Gets the move timeout.
      *
      * @return the move timeout.
      */
-    public long moveTimeout() {
-        return moveTimeout;
-    }
+    long moveTimeout();
 
     /**
      * Gets the current move index.
+     *
+     * @return the move index.
      */
-    public int currentMoveIndex() {
-        return board.currentMoveIndex();
-    }
-
-    public boolean isStarted() {
-        return started;
-    }
-
-    public boolean isEnded() {
-        return ended;
-    }
-
-    public boolean isSwapped() {
-        return swapped;
-    }
-
-    public boolean isAwaitingChoice() {
-        return awaitingChoice;
-    }
-
-    // Package-private methods
-
-    Rule rule() {
-        return rule;
-    }
-
-    Controller controller() {
-        return controller;
-    }
-
-    ListenerGroup listenerGroup() {
-        return listenerGroup;
-    }
-
-    Player player(Side side) {
-        return players[side.index()];
-    }
-
-    ChoiceSet choiceSet() {
-        return choiceSet;
-    }
-
-    void resetChoice() {
-        awaitingChoice = false;
-        choiceSet = null;
-    }
+    int currentMoveIndex();
 
     /**
-     * A builder class for Game
+     * Gets the rule of the game.
+     *
+     * @return the rule.
      */
-    public static class Builder {
+    Rule rule();
 
-        private Rule rule;
-        private ListenerGroup listenerGroup = new ListenerGroup();
-        private Player[] players = new Player[2];
-        private long gameTimeout = 0;
-        private long moveTimeout = 0;
+    /**
+     * Gets the player name by the side.
+     *
+     * @param side the side.
+     * @return the player name.
+     */
+    String playerNameBySide(Side side);
+
+    /**
+     * Tells whether this game is started.
+     */
+    boolean isStarted();
+
+    /**
+     * Tells whether this game is ended.
+     */
+    boolean isEnded();
+
+    /**
+     * Tells whether the stones are swapped.
+     */
+    boolean isSwapped();
+
+    /**
+     * Tells whether a choice is being awaited.
+     */
+    boolean isAwaitingChoice();
+
+    /**
+     * A builder of Game.
+     */
+    interface Builder {
 
         /**
          * Sets the rule of the game.
          *
-         * @param rule a Rule instance standardizing the game.
+         * @param rule a Rule instance constraining the game.
          * @return this builder.
          */
-        public Builder rule(Rule rule) {
-            this.rule = rule;
-            return this;
-        }
+        Builder rule(Rule rule);
 
         /**
          * Adds a game listener to the listener group.
@@ -241,22 +149,16 @@ public class Game {
          * @param listener the listener to be added.
          * @return this builder.
          */
-        public Builder addListener(GameListener listener) {
-            listenerGroup.add(listener);
-            return this;
-        }
+        Builder addListener(GameListener listener);
 
         /**
-         * Sets the player.
+         * Adds a player.
          *
          * @param side   the side.
          * @param player the player.
          * @return this builder.
          */
-        public Builder player(Side side, Player player) {
-            players[side.index()] = player;
-            return this;
-        }
+        Builder addPlayer(Side side, Player player);
 
         /**
          * Sets the game timeout.
@@ -265,12 +167,7 @@ public class Game {
          * @param unit    the time unit of the timeout argument.
          * @return this builder.
          */
-        public Builder gameTimeout(long timeout, TimeUnit unit) {
-            if (timeout < 0)
-                throw new IllegalArgumentException("Negative timeout");
-            this.gameTimeout = unit.toMillis(timeout);
-            return this;
-        }
+        Builder gameTimeout(long timeout, TimeUnit unit);
 
         /**
          * Sets the move timeout.
@@ -279,32 +176,25 @@ public class Game {
          * @param unit    the time unit of the timeout argument.
          * @return this builder.
          */
-        public Builder moveTimeout(long timeout, TimeUnit unit) {
-            if (timeout < 0)
-                throw new IllegalArgumentException("Negative timeout");
-            this.moveTimeout = unit.toMillis(timeout);
-            return this;
-        }
+        Builder moveTimeout(long timeout, TimeUnit unit);
 
         /**
          * Builds the game.
          *
          * @return a Game.
          */
-        public Game build() {
-            return new Game(this);
-        }
+        Game build();
     }
-
-    // Non-static inner classes
 
     /**
      * The future of the game.
      */
-    public class GameFuture {
+    interface Future {
 
-        private GameFuture() {
-        }
+        /**
+         * Interrupts the game.
+         */
+        void interrupt();
 
         /**
          * Waits for the game to end and gets the game.
@@ -312,10 +202,7 @@ public class Game {
          * @return the ended game.
          * @throws InterruptedException if the current thread was interrupted while waiting.
          */
-        public Game get() throws InterruptedException {
-            gameThread.join();
-            return Game.this;
-        }
+        Game get() throws InterruptedException;
 
         /**
          * Waits for at most the given time for the game to end and gets the game.
@@ -326,95 +213,53 @@ public class Game {
          * @throws InterruptedException if the current thread was interrupted while waiting.
          * @throws TimeoutException     if the wait timed out.
          */
-        public Game get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
-            unit.timedJoin(gameThread, timeout);
-            if (gameThread.isAlive()) throw new TimeoutException();
-            return Game.this;
-        }
-    }
-
-    public class Settings {
-        private Settings() {
-        }
-
-        public Board board() {
-            return board;
-        }
-
-        public Rule.Type ruleType() {
-            return rule.type();
-        }
-
-        public long gameTimeout() {
-            return gameTimeout;
-        }
-
-        public long moveTimeout() {
-            return moveTimeout;
-        }
+        Game get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException;
     }
 
     /**
      * A public game controller class.
      */
-    public class Controller {
-
-        private Controller() {
-            // private access
-        }
+    interface Controller {
 
         /**
          * Swaps control of the stones.
+         *
+         * @param side the side which made the swap.
          */
-        public void swap() {
-            swapped = !swapped;
-            listenerGroup.stoneSwapped();
-        }
+        void swap(Side side);
 
         /**
-         * Switch the turn to move.
+         * Switches the turn to move.
          */
-        public void switchSide() {
-            currentSide = currentSide.opposite();
-        }
+        void switchSide();
 
         /**
          * Sets the current side.
          *
          * @param side the side.
          */
-        public void setSide(Side side) {
-            currentSide = side;
-        }
+        void setSide(Side side);
 
         /**
          * Sets the current side by the stone type.
          *
          * @param stone the stone type.
          */
-        public void setSideByStoneType(StoneType stone) {
-            currentSide = sideByStoneType(stone);
-        }
+        void setSideByStoneType(StoneType stone);
 
         /**
          * Makes a move.
          *
          * @param grid the grid where the move is made.
          */
-        public void makeMove(Board.Grid grid) {
-            board.move(grid, currentStoneType());
-
-            listenerGroup.moveMade(grid, currentSide);
-        }
+        void makeMove(Board.Grid grid);
 
         /**
          * Requests multiple moves.
          *
          * @param count the count of moves requested.
          */
-        public void requestMultipleMoves(int count) {
-            // TODO: Implements multiple moves
-        }
+        void requestMultipleMoves(int count);
 
         /**
          * Requests a choice.
@@ -422,11 +267,7 @@ public class Game {
          * @param choiceSet the choice set.
          * @param side      the side.
          */
-        public void requestChoice(ChoiceSet choiceSet, Side side) {
-            currentSide = side;
-            awaitingChoice = true;
-            Game.this.choiceSet = choiceSet;
-        }
+        void requestChoice(ChoiceSet choiceSet, Side side);
 
         /**
          * Ends the game.
@@ -434,14 +275,6 @@ public class Game {
          * @param resultType  the result type of the game.
          * @param winningSide the winning side.
          */
-        public void end(Result.Type resultType, Side winningSide) {
-            ended = true;
-            started = false;
-            awaitingChoice = false;
-            choiceSet = null;
-            currentSide = null;
-            result = new Result(resultType, winningSide);
-            listenerGroup.gameEnded(result);
-        }
+        void end(Result.Type resultType, Side winningSide);
     }
 }

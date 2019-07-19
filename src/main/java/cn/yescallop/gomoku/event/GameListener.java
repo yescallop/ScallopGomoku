@@ -12,9 +12,9 @@ public interface GameListener {
     /**
      * Called when the game is started.
      *
-     * @param settings the settings of the game.
+     * @param game the game.
      */
-    void gameStarted(Game.Settings settings);
+    void gameStarted(Game game);
 
     /**
      * Called when a move is requested.
@@ -50,15 +50,18 @@ public interface GameListener {
     /**
      * Called when a choice is made.
      *
-     * @param choice the choice.
-     * @param side   the side.
+     * @param choiceSet the choice set.
+     * @param choice    the choice.
+     * @param side      the side.
      */
-    void choiceMade(int choice, Side side);
+    void choiceMade(ChoiceSet choiceSet, int choice, Side side);
 
     /**
      * Called when the stones are swapped.
+     *
+     * @param side the side which made the swap.
      */
-    void stoneSwapped();
+    void stoneSwapped(Side side);
 
     /**
      * Called when the game ends.
@@ -70,7 +73,8 @@ public interface GameListener {
     /**
      * Called when an exception is caught.
      *
-     * @param t the exception.
+     * @param t    the exception.
+     * @param side the side which the exception occurred in.
      */
-    void exceptionCaught(Throwable t);
+    void exceptionCaught(Throwable t, Side side);
 }

@@ -1,33 +1,30 @@
 package cn.yescallop.gomoku.player;
 
-import cn.yescallop.gomoku.game.Board;
-import cn.yescallop.gomoku.game.Game;
-import cn.yescallop.gomoku.game.Result;
+import cn.yescallop.gomoku.game.*;
 
 /**
- * An adapter class for Player
+ * An adapter of Player.
  *
  * @author Scallop Ye
  */
-public abstract class PlayerAdapter extends Player {
+public abstract class PlayerAdapter extends AbstractPlayer {
+
+    protected PlayerAdapter(String name) {
+        super(name);
+    }
 
     @Override
-    protected void multipleMovesRequested(int count) {
+    public void multipleMovesRequested(int count) {
 
     }
 
     @Override
-    protected void opponentMoveMade(Board.Grid move) {
+    public void opponentMoveMade(Board.Grid move) {
 
     }
 
     @Override
-    protected void opponentChoiceMade(int choice) {
-
-    }
-
-    @Override
-    public void gameStarted(Game.Settings settings) {
+    public void opponentChoiceMade(ChoiceSet choiceSet, int choice) {
 
     }
 
@@ -37,12 +34,17 @@ public abstract class PlayerAdapter extends Player {
     }
 
     @Override
+    public void gameStarted(Game game) {
+
+    }
+
+    @Override
     public void gameEnded(Result result) {
 
     }
 
     @Override
-    public void exceptionCaught(Throwable t) {
+    public void exceptionCaught(Throwable t, Side side) {
 
     }
 }
