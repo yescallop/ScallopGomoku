@@ -22,7 +22,7 @@ public class ConsolePlayer extends PlayerAdapter {
     private static String readLine() throws InterruptedException, IOException {
         StringBuilder sb = new StringBuilder();
         int c;
-        while (!Thread.interrupted()) {
+        while (true) {
             if (READER.ready()) {
                 c = READER.read();
                 if (c == '\r' || c == '\n') {
@@ -33,9 +33,13 @@ public class ConsolePlayer extends PlayerAdapter {
                     sb.append((char) c);
                 }
             }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                System.out.println("[INTERRUPTED]");
+                throw e;
+            }
         }
-        System.out.println("[INTERRUPTED]");
-        throw new InterruptedException();
     }
 
     @Override
