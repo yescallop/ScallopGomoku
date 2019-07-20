@@ -19,7 +19,7 @@ public interface Game {
      *
      * @return the builder.
      */
-    static Game.Builder newBuilder() {
+    static Builder newBuilder() {
         return new GameBuilderImpl();
     }
 
@@ -28,7 +28,7 @@ public interface Game {
      *
      * @return the future of this Game.
      */
-    Game.Future start();
+    Future start();
 
     /**
      * Gets the current side of turn.

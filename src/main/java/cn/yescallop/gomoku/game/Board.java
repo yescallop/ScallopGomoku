@@ -197,7 +197,7 @@ public class Board {
             if (first < 'A' || first > 'Z' || second < '1' || second > '9')
                 throw new IllegalArgumentException();
             int x = first - 'A';
-            int y = Integer.parseInt(s.substring(1));
+            int y = Integer.parseInt(s.substring(1)) - 1;
             return new Point(x, y);
         }
 
@@ -211,7 +211,7 @@ public class Board {
 
         @Override
         public String toString() {
-            return new String(new char[]{(char) ('A' + x), (char) ('1' + y)});
+            return ((char) ('A' + x)) + String.valueOf(y + 1);
         }
     }
 }
