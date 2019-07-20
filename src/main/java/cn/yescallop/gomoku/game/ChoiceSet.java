@@ -2,77 +2,71 @@ package cn.yescallop.gomoku.game;
 
 /**
  * A ChoiceSet represents a set of choices
- * consisting of general choices, moves or an integer range.
+ * consisting of strings, moves or move counts.
  *
  * @author Scallop Ye
  */
 public class ChoiceSet {
 
-    private final String description;
     private final Type type;
-    private final Choice[] choices;
+    private final String[] strings;
     private final Board.Point[] moves;
-    private final int[] range;
+    private final int maxMoveCount;
 
-    private ChoiceSet(String description, Type type, Choice[] choices, Board.Point[] moves, int[] range) {
-        this.description = description;
+    private ChoiceSet(Type type, String[] strings, Board.Point[] moves, int maxMoveCount) {
         this.type = type;
-        this.choices = choices;
+        this.strings = strings;
         this.moves = moves;
-        this.range = range;
+        this.maxMoveCount = maxMoveCount;
     }
 
-    public static ChoiceSet ofGeneralChoices(String description, Choice... choices) {
-        if (choices.length < 2)
+    public static ChoiceSet ofStrings(String... strings) {
+        if (strings.length < 2)
             throw new IllegalArgumentException("length < 2");
-        return new ChoiceSet(description, Type.GENERAL, choices, null, null);
+        return new ChoiceSet(Type.STRINGS, strings, null, 0);
     }
 
-    public static ChoiceSet ofMoves(String description, Board.Point[] moves) {
+    public static ChoiceSet ofMoves(Board.Point[] moves) {
         if (moves.length < 2)
             throw new IllegalArgumentException("length < 2");
-        return new ChoiceSet(description, Type.MOVES, null, moves, null);
+        return new ChoiceSet(Type.MOVES, null, moves, 0);
     }
 
-    public static ChoiceSet ofRange(String description, int start, int end) {
-        if (start >= end)
-            throw new IllegalArgumentException("start >= end");
-        return new ChoiceSet(description, Type.RANGE, null, null, new int[]{start, end});
+    public static ChoiceSet ofMoveCount(int maxMoveCount) {
+        if (maxMoveCount < 2)
+            throw new IllegalArgumentException("maxMoveCount < 2");
+        return new ChoiceSet(Type.MOVE_COUNT, null, null, maxMoveCount);
     }
 
     boolean validate(int choice) {
         switch (type) {
-            case GENERAL:
-                return choice >= 0 && choice < choices.length;
+            case STRINGS:
+                return choice >= 0 && choice < strings.length;
             case MOVES:
                 return choice >= 0 && choice < moves.length;
-            case RANGE:
-                return choice >= range[0] && choice <= range[1];
+            case MOVE_COUNT:
+                return choice >= 1 && choice <= maxMoveCount;
         }
         return false;
-    }
-
-    public String description() {
-        return description;
     }
 
     public Type type() {
         return type;
     }
 
-    public Choice[] choices() {
-        return choices;
+    public String[] strings() {
+        return strings;
     }
 
     public Board.Point[] moves() {
         return moves;
     }
 
-    public int[] range() {
-        return range;
+    public int maxMoveCount() {
+        return maxMoveCount;
     }
 
     public enum Type {
-        GENERAL, MOVES, RANGE
+        STRINGS, MOVES, MOVE_COUNT
     }
 }

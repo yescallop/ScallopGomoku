@@ -27,33 +27,8 @@ public class ConsoleGameListener extends GameListenerAdapter {
     }
 
     @Override
-    public void moveRequested(Side side) {
-
-    }
-
-    @Override
-    public void multipleMovesRequested(int count, Side side) {
-
-    }
-
-    @Override
-    public void moveMade(Board.Grid move, Side side) {
-
-    }
-
-    @Override
-    public void choiceRequested(ChoiceSet choiceSet, Side side) {
-
-    }
-
-    @Override
-    public void choiceMade(ChoiceSet choiceSet, int choice, Side side) {
-
-    }
-
-    @Override
     public void stoneSwapped(Side side) {
-        LOGGER.info(game.playerNameBySide(side) + " swapped the stones.");
+        LOGGER.info((side == null ? "Judge" : game.playerNameBySide(side)) + " swapped the stones.");
     }
 
     @Override

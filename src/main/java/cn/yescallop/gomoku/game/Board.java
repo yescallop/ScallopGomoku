@@ -7,24 +7,6 @@ package cn.yescallop.gomoku.game;
  */
 public class Board {
 
-    // Directions used for identifying adjacent grids
-    public static final int DIRECTION_UP = 0;
-    public static final int DIRECTION_DOWN = 1;
-    public static final int DIRECTION_RIGHT = 2;
-    public static final int DIRECTION_LEFT = 3;
-    public static final int DIRECTION_UP_RIGHT = 4;
-    public static final int DIRECTION_UP_LEFT = 5;
-    public static final int DIRECTION_DOWN_RIGHT = 6;
-    public static final int DIRECTION_DOWN_LEFT = 7;
-
-    /**
-     * {x, y} delta for each direction.
-     */
-    private static final int[][] ADJ_DELTA = {
-            {1, 0}, {-1, 0}, {0, 1}, {0, -1},
-            {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
-    };
-
     private final int size;
 
     /**
@@ -61,11 +43,12 @@ public class Board {
         // Fills the adjacent grids
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                for (int i = 0; i < 8; i++) {
-                    int adjX = x + ADJ_DELTA[i][0];
-                    int adjY = y + ADJ_DELTA[i][1];
+                for (Direction d : Direction.values()) {
+                    int[] delta = d.delta();
+                    int adjX = x + delta[0];
+                    int adjY = y + delta[1];
                     if (adjX >= 0 && adjX < size && adjY >= 0 && adjY < size)
-                        matrix[y][x].adjacentGrids[i] = matrix[adjY][adjX];
+                        matrix[y][x].adjacentGrids[d.index()] = matrix[adjY][adjX];
                 }
             }
         }
@@ -170,8 +153,12 @@ public class Board {
             return moveIndex;
         }
 
-        public Grid adjacent(int direction) {
-            return adjacentGrids[direction];
+        public Grid adjacent(int index) {
+            return adjacentGrids[index];
+        }
+
+        public Grid adjacent(Direction direction) {
+            return adjacentGrids[direction.index()];
         }
 
         @Override
