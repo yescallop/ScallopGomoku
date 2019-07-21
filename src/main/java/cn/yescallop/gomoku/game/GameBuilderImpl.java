@@ -16,6 +16,7 @@ class GameBuilderImpl implements Game.Builder {
     Player[] players = new Player[2];
     long gameTimeout = 0;
     long moveTimeout = 0;
+    boolean strict = false;
 
     @Override
     public GameBuilderImpl rule(Rule rule) {
@@ -48,6 +49,12 @@ class GameBuilderImpl implements Game.Builder {
         if (timeout < 0)
             throw new IllegalArgumentException("Negative timeout");
         this.moveTimeout = unit.toMillis(timeout);
+        return this;
+    }
+
+    @Override
+    public Game.Builder strict(boolean strict) {
+        this.strict = strict;
         return this;
     }
 

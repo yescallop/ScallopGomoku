@@ -3,7 +3,10 @@ package cn.yescallop.gomoku.game;
 import cn.yescallop.gomoku.player.Player;
 import cn.yescallop.gomoku.rule.Judge;
 import cn.yescallop.gomoku.rule.Rule;
+import cn.yescallop.gomoku.rule.RuleHelper;
+import cn.yescallop.gomoku.rule.StoneShape;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -20,6 +23,7 @@ class GameImpl implements Game {
 
     private final long gameTimeout;
     private final long moveTimeout;
+    private final boolean strict;
 
     final Judge judge;
     final Controller controller = new ControllerImpl();
@@ -49,6 +53,7 @@ class GameImpl implements Game {
 
         this.gameTimeout = builder.gameTimeout;
         this.moveTimeout = builder.moveTimeout;
+        this.strict = builder.strict;
 
         this.listenerGroup = builder.listenerGroup;
         // Adds players to the listener group
@@ -107,6 +112,26 @@ class GameImpl implements Game {
     }
 
     @Override
+    public boolean reportForbiddenMove(Board.Point point) {
+        if (!started || !rule.isRenjuRule() || strict)
+            return false;
+        Board.Grid grid = board.getGrid(point);
+        if (grid.stone() != StoneType.BLACK)
+            return false;
+        if (grid.moveIndex() == board.currentMoveIndex()) {
+            List<StoneShape> shapes = RuleHelper.searchShapes(grid);
+            if (RuleHelper.checkForbiddenMove(shapes)) {
+                controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE));
+                return true;
+            }
+        } else if (RuleHelper.longestChainSize(grid) > 5) {
+            controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public long gameTimeout() {
         return gameTimeout;
     }
@@ -114,6 +139,11 @@ class GameImpl implements Game {
     @Override
     public long moveTimeout() {
         return moveTimeout;
+    }
+
+    @Override
+    public boolean isStrict() {
+        return strict;
     }
 
     @Override

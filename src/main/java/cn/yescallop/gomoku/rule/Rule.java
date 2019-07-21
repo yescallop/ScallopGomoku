@@ -10,14 +10,25 @@ import java.util.function.Supplier;
 public interface Rule {
 
     /**
-     * Creates a rule with the specified name and judge supplier.
+     * Creates a Gomoku rule with the specified name and judge supplier.
      *
      * @param name          the name.
      * @param judgeSupplier the judge supplier.
      * @return the rule.
      */
-    static Rule create(String name, Supplier<Judge> judgeSupplier) {
-        return new RuleImpl(name, judgeSupplier);
+    static Rule createGomoku(String name, Supplier<Judge> judgeSupplier) {
+        return new RuleImpl(name, false, judgeSupplier);
+    }
+
+    /**
+     * Creates a Renju rule with the specified name and judge supplier.
+     *
+     * @param name          the name.
+     * @param judgeSupplier the judge supplier.
+     * @return the rule.
+     */
+    static Rule createRenju(String name, Supplier<Judge> judgeSupplier) {
+        return new RuleImpl(name, true, judgeSupplier);
     }
 
     /**
@@ -33,4 +44,11 @@ public interface Rule {
      * @return the name.
      */
     String name();
+
+    /**
+     * Gets whether the rule is a Renju rule.
+     *
+     * @return whether the rule is a Renju rule.
+     */
+    boolean isRenjuRule();
 }

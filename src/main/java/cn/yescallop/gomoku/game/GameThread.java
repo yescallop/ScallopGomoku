@@ -80,7 +80,7 @@ class GameThread extends Thread {
             throw new IllegalMoveException("Out of board");
         }
 
-        if (grid.isOccupied())
+        if (!grid.isEmpty())
             throw new IllegalMoveException("Moving into an occupied grid");
 
         game.judge.processMove(grid, side);

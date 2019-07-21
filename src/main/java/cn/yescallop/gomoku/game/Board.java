@@ -145,8 +145,8 @@ public class Board {
             return stone;
         }
 
-        public boolean isOccupied() {
-            return stone != null;
+        public boolean isEmpty() {
+            return stone == null;
         }
 
         public int moveIndex() {

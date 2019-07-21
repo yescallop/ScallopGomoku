@@ -14,6 +14,7 @@ public class Main {
     public static void main(String[] args) {
         Game game = Game.newBuilder()
                 .rule(StandardRules.STANDARD_RENJU)
+                .strict(true)
                 .addPlayer(Side.FIRST, new ConsolePlayer("Player 1"))
                 .addPlayer(Side.SECOND, new ConsolePlayer("Player 2"))
                 .addListener(new ConsoleGameListener())

@@ -75,6 +75,16 @@ public interface Game {
     Board board();
 
     /**
+     * Reports a forbidden move.
+     * It is not recommended to report yourself.
+     *
+     * @param point the point where the move was made,
+     *              or the point where there's an overline.
+     * @return true if the report succeeded, or else false.
+     */
+    boolean reportForbiddenMove(Board.Point point);
+
+    /**
      * Gets the game timeout.
      *
      * @return the game timeout.
@@ -87,6 +97,13 @@ public interface Game {
      * @return the move timeout.
      */
     long moveTimeout();
+
+    /**
+     * Gets whether this game is strict.
+     *
+     * @return whether this game is strict.
+     */
+    boolean isStrict();
 
     /**
      * Gets the current move index.
@@ -177,6 +194,18 @@ public interface Game {
          * @return this builder.
          */
         Builder moveTimeout(long timeout, TimeUnit unit);
+
+        /**
+         * Sets whether the game is strict.
+         * "Strict" means that in Renju rules,
+         * if Black makes a forbidden move,
+         * the game will end immediately with
+         * White as the winner.
+         *
+         * @param strict whether the game is strict.
+         * @return this builder.
+         */
+        Builder strict(boolean strict);
 
         /**
          * Builds the game.

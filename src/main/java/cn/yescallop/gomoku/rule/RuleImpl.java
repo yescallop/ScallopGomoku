@@ -8,10 +8,12 @@ import java.util.function.Supplier;
 class RuleImpl implements Rule {
 
     private final String name;
+    private final boolean renju;
     private final Supplier<Judge> judgeSupplier;
 
-    RuleImpl(String name, Supplier<Judge> judgeSupplier) {
+    RuleImpl(String name, boolean renju, Supplier<Judge> judgeSupplier) {
         this.name = name;
+        this.renju = renju;
         this.judgeSupplier = judgeSupplier;
     }
 
@@ -23,5 +25,10 @@ class RuleImpl implements Rule {
     @Override
     public String name() {
         return name;
+    }
+
+    @Override
+    public boolean isRenjuRule() {
+        return renju;
     }
 }

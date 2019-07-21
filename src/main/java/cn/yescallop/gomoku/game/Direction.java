@@ -8,13 +8,13 @@ package cn.yescallop.gomoku.game;
 public enum Direction {
 
     UP(0, new int[]{0, 1}),
-    DOWN(1, new int[]{0, -1}),
-    RIGHT(2, new int[]{1, 0}),
-    LEFT(3, new int[]{-1, 0}),
-    UP_RIGHT(4, new int[]{1, 1}),
-    UP_LEFT(5, new int[]{-1, 1}),
-    DOWN_RIGHT(6, new int[]{1, -1}),
-    DOWN_LEFT(7, new int[]{-1, -1});
+    RIGHT(1, new int[]{1, 0}),
+    UP_RIGHT(2, new int[]{1, 1}),
+    DOWN_RIGHT(3, new int[]{1, -1}),
+    DOWN(4, new int[]{0, -1}),
+    LEFT(5, new int[]{-1, 0}),
+    DOWN_LEFT(6, new int[]{-1, -1}),
+    UP_LEFT(7, new int[]{-1, 1});
 
     private final int index;
     private final int[] delta;
@@ -52,5 +52,9 @@ public enum Direction {
                 return UP_RIGHT;
         }
         return null;
+    }
+
+    public static int reverse(int d) {
+        return d ^ 0b100;
     }
 }
