@@ -3,25 +3,20 @@ package cn.yescallop.gomoku.rule.standard;
 import cn.yescallop.gomoku.game.*;
 
 /**
- * A judge of the rule "Swap".
- *
  * @author Scallop Ye
  */
-public class Swap extends StandardGomoku {
-
+public class ChineseSwap extends StandardGomoku {
     @Override
     public void processMove(Board.Grid grid, Side side) throws IllegalMoveException {
         int index = game.currentMoveIndex();
-        if (index > 2) {
+        if (index != 0) {
             super.processMove(grid, side);
             return;
         }
         controller.makeMove(grid);
-        if (index == 2) {
-            controller.requestChoice(
-                    ChoiceSet.ofStrings("Choose Black", "Choose White"),
-                    Side.SECOND);
-        } else controller.swap(null);
+        controller.requestChoice(
+                ChoiceSet.ofStrings("Choose Black", "Choose White"),
+                Side.SECOND);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package cn.yescallop.gomoku.rule.standard;
 
-import cn.yescallop.gomoku.game.Board;
-import cn.yescallop.gomoku.game.ChoiceSet;
-import cn.yescallop.gomoku.game.Side;
-import cn.yescallop.gomoku.game.StoneType;
+import cn.yescallop.gomoku.game.*;
 
 /**
  * A judge of the rule "Swap2".
@@ -15,7 +12,7 @@ public class Swap2 extends StandardGomoku {
     private boolean choiceMade = false;
 
     @Override
-    public void processMove(Board.Grid grid, Side side) {
+    public void processMove(Board.Grid grid, Side side) throws IllegalMoveException {
         if (choiceMade) {
             super.processMove(grid, side);
             return;

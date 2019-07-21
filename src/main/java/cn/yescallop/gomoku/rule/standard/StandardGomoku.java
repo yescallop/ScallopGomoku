@@ -1,6 +1,7 @@
 package cn.yescallop.gomoku.rule.standard;
 
 import cn.yescallop.gomoku.game.Board;
+import cn.yescallop.gomoku.game.IllegalMoveException;
 import cn.yescallop.gomoku.game.Result;
 import cn.yescallop.gomoku.game.Side;
 import cn.yescallop.gomoku.rule.AbstractJudge;
@@ -17,7 +18,7 @@ import cn.yescallop.gomoku.rule.RuleHelper;
 public class StandardGomoku extends AbstractJudge {
 
     @Override
-    public void processMove(Board.Grid grid, Side side) {
+    public void processMove(Board.Grid grid, Side side) throws IllegalMoveException {
         controller.makeMove(grid);
         if (RuleHelper.longestChainSize(grid) == 5) {
             controller.end(Result.Type.CHAIN_COMPLETED, side);

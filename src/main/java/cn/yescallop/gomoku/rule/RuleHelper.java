@@ -48,4 +48,19 @@ public final class RuleHelper {
         }
         return res;
     }
+
+    /**
+     * Calculates the Chebyshev Distance
+     * from the grid to the board center.
+     *
+     * @param grid      the grid.
+     * @param boardSize the board size.
+     * @return the Chebyshev Distance.
+     */
+    public static int chebyshevDistToCenter(Board.Grid grid, int boardSize) {
+        int center = (boardSize - 1) / 2;
+        int dx = Math.abs(grid.x() - center);
+        int dy = Math.abs(grid.y() - center);
+        return Math.max(dx, dy);
+    }
 }
