@@ -4,13 +4,20 @@ import cn.yescallop.gomoku.game.Board;
 import cn.yescallop.gomoku.game.Direction;
 import cn.yescallop.gomoku.game.StoneType;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * @author Scallop Ye
  */
 public final class RuleHelper {
+
+    /**
+     * The maximum check depth of the interrelationship
+     * of the forbidden moves.
+     */
+    private static final int FORBIDDEN_MOVE_MAX_CHECK_DEPTH = 4;
 
     private RuleHelper() {
         // no instance
@@ -66,6 +73,36 @@ public final class RuleHelper {
         return Math.max(dx, dy);
     }
 
+    public static String describeForbiddenMove(List<StoneShape> shapes) {
+        if (shapes.contains(StoneShape.FIVE))
+            return null;
+        int activeThrees = 0;
+        int fours = 0;
+        for (StoneShape p : shapes) {
+            switch (p) {
+                case OVERLINE:
+                    return "Overline";
+                case ACTIVE_THREE:
+                    activeThrees++;
+                    break;
+                case FOUR:
+                    fours++;
+                    break;
+            }
+        }
+        if (activeThrees >= 2 || fours >= 2) {
+            StringJoiner sj = new StringJoiner("-");
+            for (int i = 0; i < fours; i++) {
+                sj.add(String.valueOf('4'));
+            }
+            for (int i = 0; i < activeThrees; i++) {
+                sj.add(String.valueOf('3'));
+            }
+            return sj + " Forbidden Move";
+        }
+        return null;
+    }
+
     /**
      * Checks whether a forbidden move is
      * contained in the shapes.
@@ -74,6 +111,8 @@ public final class RuleHelper {
      * @return whether there's a forbidden move,
      */
     public static boolean checkForbiddenMove(List<StoneShape> shapes) {
+        if (shapes.contains(StoneShape.FIVE))
+            return false;
         int activeThrees = 0;
         int fours = 0;
         for (StoneShape p : shapes) {
@@ -93,15 +132,29 @@ public final class RuleHelper {
 
     /**
      * Searches shapes containing the specified grid.
-     * TODO: Fix wrong shape judgement due to forbidden moves.
      *
      * @param grid the grid.
      * @return a list of shapes.
      */
     public static List<StoneShape> searchShapes(Board.Grid grid) {
-        List<StoneShape> res = new ArrayList<>();
+        return searchShapes(grid, null);
+    }
+
+    /**
+     * Searches shapes containing the specified grid.
+     *
+     * @param grid    the grid.
+     * @param checked the last node of checked grids.
+     * @return a list of shapes.
+     */
+    private static List<StoneShape> searchShapes(Board.Grid grid, GridNode checked) {
+        if (grid.isEmpty()) {
+            checked = checked == null ? new GridNode(grid, null) : checked.next(grid);
+        }
+
+        List<StoneShape> res = new LinkedList<>();
         for (int d = 0; d < 4; d++) {
-            lsp(grid, d, res);
+            lsp(grid, checked, d, res);
         }
         return res;
     }
@@ -109,14 +162,16 @@ public final class RuleHelper {
     /**
      * Searches shapes in the line.
      *
-     * @param grid the grid.
-     * @param d    the direction index.
-     * @param res  the list of shapes.
+     * @param grid    the grid.
+     * @param checked the last node of checked grids.
+     * @param d       the direction index.
+     * @param res     the list of shapes.
      */
-    private static void lsp(Board.Grid grid, int d, List<StoneShape> res) {
-        int[][] dsp = new int[2][2];
-        boolean[] active = {dsp(grid, d, dsp[0]), dsp(grid, Direction.reverse(d), dsp[1])};
-        int chain = dsp[0][0] + dsp[1][0] + 1;
+    private static void lsp(Board.Grid grid, GridNode checked, int d, List<StoneShape> res) {
+        int[][] dsp = new int[2][2]; // dsp results
+        int[] ds = new int[]{d, Direction.reverse(d)}; // directions
+        boolean[] active = {dsp(grid, checked, ds[0], dsp[0]), dsp(grid, checked, ds[1], dsp[1])};
+        int chain = dsp[0][0] + dsp[1][0] + 1; // chain size
         if (chain == 5) {
             res.add(StoneShape.FIVE);
             return;
@@ -128,14 +183,31 @@ public final class RuleHelper {
         if (!active[0] && !active[1]) return;
 
         for (int i = 0; i < 2; i++) {
-            int total = chain + dsp[i][1];
+            int[] fwdDsp = dsp[i];
+            int[] oppDsp = dsp[i ^ 1];
+            int total = chain + fwdDsp[1];
             if (total == 3) {
-                if (active[i] && dsp[i ^ 1][1] == 0) {
-                    // total = 3 and both directions active => Active Three
+                // total = 3, active ahead and no chain behind => Active Three
+                if (active[i] && oppDsp[1] == 0) {
+                    // Check forbidden move
+                    Board.Grid aheadFirst = grid.adjacent(ds[i], fwdDsp[0] + 1);
+                    Board.Grid aheadSecond = aheadFirst.adjacent(ds[i], fwdDsp[1] + 1);
+                    Board.Grid behind = grid.adjacent(ds[i ^ 1], oppDsp[0] + 1);
+                    if ((cfm(aheadFirst, checked)) ||
+                            (cfm(aheadSecond, checked)) ||
+                            (cfm(behind, checked))) {
+                        return;
+                    }
+
                     res.add(StoneShape.ACTIVE_THREE);
                     return;
                 }
             } else if (total == 4) {
+                // Check forbidden move
+                Board.Grid ahead = grid.adjacent(ds[i], fwdDsp[0] + 1);
+                if (cfm(ahead, checked))
+                    continue;
+
                 res.add(StoneShape.FOUR);
                 if (chain == 4) // Avoid double Fours
                     return;
@@ -144,33 +216,51 @@ public final class RuleHelper {
     }
 
     /**
+     * Checks whether there's a forbidden move in the grid.
+     *
+     * @param grid    the grid.
+     * @param checked the last node of checked grids.
+     * @return whether there's a forbidden move,
+     */
+    private static boolean cfm(Board.Grid grid, GridNode checked) {
+        if (checked != null && (checked.search(grid) || checked.index > FORBIDDEN_MOVE_MAX_CHECK_DEPTH))
+            return false;
+
+        return checkForbiddenMove(searchShapes(grid, checked));
+    }
+
+    /**
      * Calculates the size of the chain in the direction,
      * and when it reaches the end, searches ahead for a
      * second chain and also calculates the size.
      * Between the two chains is one empty grid.
      *
-     * @param grid the grid, exclusive.
-     * @param d    the direction index.
-     * @param res  an array of length 2 to store the result,
-     *             in which the first element is the size of
-     *             the first chain, and the second element
-     *             is the size of the second chain (-1 if no
-     *             empty grid is reached).
+     * @param grid    the grid, exclusive.
+     * @param checked the last node of checked grids.
+     * @param d       the direction index.
+     * @param res     an array of length 2 to store the result,
+     *                in which the first element is the size of
+     *                the first chain, and the second element
+     *                is the size of the second chain (-1 if no
+     *                empty grid is reached).
      * @return true if the shape is active in the direction,
      * or else false.
      */
-    private static boolean dsp(Board.Grid grid, int d, int[] res) {
+    private static boolean dsp(Board.Grid grid, GridNode checked, int d, int[] res) {
         res[0] = 0;
         res[1] = -1; // -1 if no empty grid is reached
         int i = 0; // Increment when reaching an empty grid
-        StoneType stone = grid.stone();
         while (i < 2) {
             grid = grid.adjacent(d);
             if (grid != null) {
-                if (grid.stone() == stone) {
+                if (grid.stone() == StoneType.BLACK) {
                     res[i]++; // Black
                     continue;
                 } else if (grid.isEmpty()) {
+                    if (checked != null && checked.search(grid)) {
+                        res[i]++; // Regard it as Black
+                        continue;
+                    }
                     i++; // Empty grid
                     if (i == 1)
                         res[1] = 0;
@@ -183,4 +273,29 @@ public final class RuleHelper {
                 ((grid = grid.adjacent(d)) == null || grid.stone() != StoneType.BLACK);
     }
 
+    private static class GridNode {
+        Board.Grid value;
+        GridNode prev;
+        int index;
+
+        GridNode(Board.Grid value, GridNode prev) {
+            this.value = value;
+            this.prev = prev;
+            this.index = prev == null ? 1 : prev.index + 1;
+        }
+
+        boolean search(Board.Grid grid) {
+            GridNode cur = this;
+            while (cur != null) {
+                if (cur.value == grid)
+                    return true;
+                cur = cur.prev;
+            }
+            return false;
+        }
+
+        GridNode next(Board.Grid grid) {
+            return new GridNode(grid, this);
+        }
+    }
 }

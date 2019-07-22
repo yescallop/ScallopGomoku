@@ -305,5 +305,14 @@ public interface Game {
          * @param winningSide the winning side.
          */
         void end(Result.Type resultType, Side winningSide);
+
+        /**
+         * Ends the game.
+         *
+         * @param resultType  the result type of the game.
+         * @param winningSide the winning side.
+         * @param description the description.
+         */
+        void end(Result.Type resultType, Side winningSide, String description);
     }
 }

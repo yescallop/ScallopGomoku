@@ -120,12 +120,13 @@ class GameImpl implements Game {
             return false;
         if (grid.moveIndex() == board.currentMoveIndex()) {
             List<StoneShape> shapes = RuleHelper.searchShapes(grid);
-            if (RuleHelper.checkForbiddenMove(shapes)) {
-                controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE));
+            String description = RuleHelper.describeForbiddenMove(shapes);
+            if (description != null) {
+                controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE), description);
                 return true;
             }
         } else if (RuleHelper.longestChainSize(grid) > 5) {
-            controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE));
+            controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE), "Overline");
             return true;
         }
         return false;
@@ -275,12 +276,17 @@ class GameImpl implements Game {
 
         @Override
         public void end(Result.Type resultType, Side winningSide) {
+            end(resultType, winningSide, null);
+        }
+
+        @Override
+        public void end(Result.Type resultType, Side winningSide, String description) {
             ended = true;
             started = false;
             awaitingChoice = false;
             choiceSet = null;
             currentSide = null;
-            result = new Result(resultType, winningSide);
+            result = new Result(resultType, winningSide, description);
             listenerGroup.gameEnded(result);
         }
     }

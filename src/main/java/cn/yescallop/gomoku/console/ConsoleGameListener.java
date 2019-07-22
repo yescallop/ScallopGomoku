@@ -39,7 +39,8 @@ public class ConsoleGameListener extends GameListenerAdapter {
         if (side != null)
             LOGGER.info("The winner: {} ({})", game.stoneTypeBySide(side), game.playerNameBySide(side));
         else LOGGER.info("The game ended in a draw.");
-        LOGGER.info("Reason: " + result.type().description());
+        LOGGER.info("Reason: " + result.type().message());
+        result.description().ifPresent(d -> LOGGER.info("Description: " + d));
     }
 
     @Override

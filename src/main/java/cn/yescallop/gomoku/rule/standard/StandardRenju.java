@@ -28,8 +28,9 @@ public class StandardRenju extends AbstractJudge {
                 controller.end(Result.Type.CHAIN_COMPLETED, side);
                 return;
             }
-            if (RuleHelper.checkForbiddenMove(shapes)) {
-                controller.end(Result.Type.FORBIDDEN_MOVE_MADE, side.opposite());
+            String description = RuleHelper.describeForbiddenMove(shapes);
+            if (description != null) {
+                controller.end(Result.Type.FORBIDDEN_MOVE_MADE, side.opposite(), description);
                 return;
             }
         } else {

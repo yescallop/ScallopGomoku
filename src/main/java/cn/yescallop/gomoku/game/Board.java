@@ -157,13 +157,19 @@ public class Board {
             return adjacentGrids[index];
         }
 
-        public Grid adjacent(Direction direction) {
-            return adjacentGrids[direction.index()];
+        public Grid adjacent(int index, int steps) {
+            Grid grid = this;
+            for (int i = 0; i < steps; i++) {
+                grid = grid.adjacentGrids[index];
+                if (grid == null)
+                    return null;
+            }
+            return grid;
         }
 
         @Override
         public String toString() {
-            return "Grid{" + x + ", " + y + ", " + stone + "}";
+            return "Grid{" + ((char) ('A' + x)) + (y + 1) + ", " + stone + "}";
         }
     }
 
@@ -179,12 +185,20 @@ public class Board {
         public static Point parse(String s) {
             if (s.length() < 2)
                 throw new IllegalArgumentException();
+
             char first = s.charAt(0);
+            int x;
+            if (first >= 'A' && first <= 'Z') {
+                x = first - 'A';
+            } else if (first >= 'a' && first <= 'z') {
+                x = first - 'a';
+            } else throw new IllegalArgumentException();
+
             char second = s.charAt(1);
-            if (first < 'A' || first > 'Z' || second < '1' || second > '9')
+            if (second < '1' || second > '9')
                 throw new IllegalArgumentException();
-            int x = first - 'A';
             int y = Integer.parseInt(s.substring(1)) - 1;
+
             return new Point(x, y);
         }
 
