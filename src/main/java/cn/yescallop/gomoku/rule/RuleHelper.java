@@ -24,13 +24,15 @@ public final class RuleHelper {
     }
 
     /**
-     * Calculates the size of the longest chain
+     * Calculates the size of the longest row
      * containing the specified grid.
      *
      * @param grid the grid.
      * @return the size.
      */
-    public static int longestChainSize(Board.Grid grid) {
+    public static int longestRowSize(Board.Grid grid) {
+        if (grid.isEmpty())
+            throw new IllegalArgumentException("Empty grid");
         int res = 0;
         for (int d = 0; d < 4; d++) {
             int cs = dcs(grid, d) + dcs(grid, Direction.reverse(d)) + 1;
@@ -40,7 +42,7 @@ public final class RuleHelper {
     }
 
     /**
-     * Calculates the size of the chain in the direction.
+     * Calculates the size of the row in the direction.
      *
      * @param grid the grid, exclusive.
      * @param d    the direction index.
@@ -73,6 +75,13 @@ public final class RuleHelper {
         return Math.max(dx, dy);
     }
 
+    /**
+     * Describes the forbidden move contained in the shapes.
+     *
+     * @param shapes the shapes.
+     * @return a String describing the forbidden move if
+     * there is a forbidden move, or else null.
+     */
     public static String describeForbiddenMove(List<StoneShape> shapes) {
         if (shapes.contains(StoneShape.FIVE))
             return null;
@@ -171,12 +180,12 @@ public final class RuleHelper {
         int[][] dsp = new int[2][2]; // dsp results
         int[] ds = new int[]{d, Direction.reverse(d)}; // directions
         boolean[] active = {dsp(grid, checked, ds[0], dsp[0]), dsp(grid, checked, ds[1], dsp[1])};
-        int chain = dsp[0][0] + dsp[1][0] + 1; // chain size
-        if (chain == 5) {
+        int row = dsp[0][0] + dsp[1][0] + 1; // row size
+        if (row == 5) {
             res.add(StoneShape.FIVE);
             return;
         }
-        if (chain > 5) {
+        if (row > 5) {
             res.add(StoneShape.OVERLINE);
             return;
         }
@@ -185,9 +194,9 @@ public final class RuleHelper {
         for (int i = 0; i < 2; i++) {
             int[] fwdDsp = dsp[i];
             int[] oppDsp = dsp[i ^ 1];
-            int total = chain + fwdDsp[1];
+            int total = row + fwdDsp[1];
             if (total == 3) {
-                // total = 3, active ahead and no chain behind => Active Three
+                // total = 3, active ahead and no row behind => Active Three
                 if (active[i] && oppDsp[1] == 0) {
                     // Check forbidden move
                     Board.Grid aheadFirst = grid.adjacent(ds[i], fwdDsp[0] + 1);
@@ -209,7 +218,7 @@ public final class RuleHelper {
                     continue;
 
                 res.add(StoneShape.FOUR);
-                if (chain == 4) // Avoid double Fours
+                if (row == 4) // Avoid double Fours
                     return;
             }
         }
@@ -230,18 +239,18 @@ public final class RuleHelper {
     }
 
     /**
-     * Calculates the size of the chain in the direction,
+     * Calculates the size of the row in the direction,
      * and when it reaches the end, searches ahead for a
-     * second chain and also calculates the size.
-     * Between the two chains is one empty grid.
+     * second row and also calculates the size.
+     * Between the two rows is one empty grid.
      *
      * @param grid    the grid, exclusive.
      * @param checked the last node of checked grids.
      * @param d       the direction index.
      * @param res     an array of length 2 to store the result,
      *                in which the first element is the size of
-     *                the first chain, and the second element
-     *                is the size of the second chain (-1 if no
+     *                the first row, and the second element
+     *                is the size of the second row (-1 if no
      *                empty grid is reached).
      * @return true if the shape is active in the direction,
      * or else false.

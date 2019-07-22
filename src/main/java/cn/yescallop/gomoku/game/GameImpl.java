@@ -125,7 +125,7 @@ class GameImpl implements Game {
                 controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE), description);
                 return true;
             }
-        } else if (RuleHelper.longestChainSize(grid) > 5) {
+        } else if (RuleHelper.longestRowSize(grid) > 5) {
             controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE), "Overline");
             return true;
         }

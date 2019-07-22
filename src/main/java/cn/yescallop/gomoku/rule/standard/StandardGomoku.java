@@ -20,8 +20,8 @@ public class StandardGomoku extends AbstractJudge {
     @Override
     public void processMove(Board.Grid grid, Side side) throws IllegalMoveException {
         controller.makeMove(grid);
-        if (RuleHelper.longestChainSize(grid) == 5) {
-            controller.end(Result.Type.CHAIN_COMPLETED, side);
+        if (RuleHelper.longestRowSize(grid) == 5) {
+            controller.end(Result.Type.ROW_COMPLETED, side);
             return;
         }
         controller.switchSide();

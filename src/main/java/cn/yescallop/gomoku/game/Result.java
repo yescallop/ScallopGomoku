@@ -36,7 +36,7 @@ public class Result {
     }
 
     public enum Type {
-        CHAIN_COMPLETED("A chain has been completed"),
+        ROW_COMPLETED("A row has been completed"),
         FORBIDDEN_MOVE_MADE("A forbidden move was made"),
         TIMEOUT("Timeout"),
         EXCEPTION("Unexpected exception occurred"),
