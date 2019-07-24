@@ -26,12 +26,10 @@ class GameThread extends Thread {
 
     @Override
     public void run() {
-        Side side = null;
-        long startTime = 0;
-        try {
-            while (!game.isEnded()) {
-                side = game.currentSide();
-                startTime = System.currentTimeMillis();
+        while (!game.isEnded()) {
+            Side side = game.currentSide();
+            long startTime = System.currentTimeMillis();
+            try {
                 if (game.isAwaitingChoice()) {
                     requestChoice(game.choiceSet(), side);
                 } else {
@@ -42,29 +40,28 @@ class GameThread extends Thread {
                     gameTimeRemaining[side.index()] -= elapsedTime;
                 if (moveTimeRemaining != null)
                     moveTimeRemaining[side.index()] = game.moveTimeout;
-            }
-        } catch (InterruptedException e) {
-            // Thread interrupted
-            game.controller.end(Result.Type.INTERRUPT, null);
-        } catch (ExecutionException | IllegalMoveException | IllegalChoiceException e) {
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            // Player exception
-            game.listenerGroup.exceptionCaught(e, side);
+            } catch (InterruptedException e) {
+                // Thread interrupted
+                game.controller.end(Result.Type.INTERRUPT, null);
+            } catch (ExecutionException | IllegalMoveException | IllegalChoiceException e) {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                // Player exception
+                game.listenerGroup.exceptionCaught(e, side);
 
-            if (gameTimeRemaining != null)
-                gameTimeRemaining[side.index()] -= elapsedTime;
-            if (moveTimeRemaining != null)
-                moveTimeRemaining[side.index()] -= elapsedTime;
-        } catch (TimeoutException e) {
-            // Timeout
-            game.controller.end(Result.Type.TIMEOUT, side.opposite());
-        } catch (Exception e) {
-            // Unexpected exception
-            game.listenerGroup.exceptionCaught(e, null);
-            game.controller.end(Result.Type.EXCEPTION, null);
-        } finally {
-            executor.shutdown();
+                if (gameTimeRemaining != null)
+                    gameTimeRemaining[side.index()] -= elapsedTime;
+                if (moveTimeRemaining != null)
+                    moveTimeRemaining[side.index()] -= elapsedTime;
+            } catch (TimeoutException e) {
+                // Timeout
+                game.controller.end(Result.Type.TIMEOUT, side.opposite());
+            } catch (Exception e) {
+                // Unexpected exception
+                game.listenerGroup.exceptionCaught(e, null);
+                game.controller.end(Result.Type.EXCEPTION, null);
+            }
         }
+        executor.shutdown();
     }
 
     private void requestMove(Side side)
