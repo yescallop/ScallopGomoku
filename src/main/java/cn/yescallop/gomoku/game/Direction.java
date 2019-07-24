@@ -54,6 +54,12 @@ public enum Direction {
         return null;
     }
 
+    /**
+     * Reverses a direction index.
+     *
+     * @param d the direction index.
+     * @return the reversed direction index.
+     */
     public static int reverse(int d) {
         return d ^ 0b100;
     }

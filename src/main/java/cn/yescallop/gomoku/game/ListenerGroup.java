@@ -42,8 +42,8 @@ class ListenerGroup extends HashSet<GameListener> implements GameListener {
     }
 
     @Override
-    public void stoneSwapped(Side side) {
-        forEach(l -> l.stoneSwapped(side));
+    public void stoneSwapped() {
+        forEach(GameListener::stoneSwapped);
     }
 
     @Override

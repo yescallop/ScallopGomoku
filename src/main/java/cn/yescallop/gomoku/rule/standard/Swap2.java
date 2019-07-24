@@ -27,20 +27,20 @@ public class Swap2 extends StandardGomoku {
             controller.requestChoice(
                     ChoiceSet.ofStrings("Choose Black", "Choose White"),
                     Side.FIRST);
-        } else controller.swap(null);
+        } else controller.swap();
     }
 
     @Override
     public void processChoice(int choice, Side side) {
         int index = game.currentMoveIndex();
         if (index == 3) {
-            if (choice == 0) controller.swap(side);
+            if (choice == 0) controller.swap();
             if (choice != 2) {
                 controller.setSideByStoneType(StoneType.WHITE);
                 choiceMade = true;
             }
         } else if (index == 5) {
-            if (choice == 0) controller.swap(side);
+            if (choice == 0) controller.swap();
             controller.setSideByStoneType(StoneType.WHITE);
             choiceMade = true;
         }

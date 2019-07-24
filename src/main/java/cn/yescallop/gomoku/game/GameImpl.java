@@ -7,6 +7,7 @@ import cn.yescallop.gomoku.rule.RuleHelper;
 import cn.yescallop.gomoku.rule.StoneShape;
 
 import java.util.List;
+import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -20,10 +21,10 @@ class GameImpl implements Game {
     private final Board board;
     private final Rule rule;
     private final Player[] players;
-
-    private final long gameTimeout;
-    private final long moveTimeout;
     private final boolean strict;
+
+    final long gameTimeout;
+    final long moveTimeout;
 
     final Judge judge;
     final Controller controller = new ControllerImpl();
@@ -35,7 +36,6 @@ class GameImpl implements Game {
     private boolean ended;
     private boolean swapped = false;
 
-    private boolean awaitingChoice = false;
     private ChoiceSet choiceSet = null;
 
     private Side currentSide = Side.FIRST;
@@ -133,13 +133,19 @@ class GameImpl implements Game {
     }
 
     @Override
-    public long gameTimeout() {
-        return gameTimeout;
+    public OptionalLong gameTimeout() {
+        return gameTimeout == 0 ? OptionalLong.empty() : OptionalLong.of(gameTimeout);
     }
 
     @Override
-    public long moveTimeout() {
-        return moveTimeout;
+    public OptionalLong moveTimeout() {
+        return moveTimeout == 0 ? OptionalLong.empty() : OptionalLong.of(moveTimeout);
+    }
+
+    @Override
+    public OptionalLong gameTimeRemaining(Side side) {
+        return gameThread.gameTimeRemaining == null ?
+                OptionalLong.empty() : OptionalLong.of(gameThread.gameTimeRemaining[side.index()]);
     }
 
     @Override
@@ -179,7 +185,7 @@ class GameImpl implements Game {
 
     @Override
     public boolean isAwaitingChoice() {
-        return awaitingChoice;
+        return choiceSet != null;
     }
 
     // Package-private methods
@@ -193,7 +199,6 @@ class GameImpl implements Game {
     }
 
     void resetChoice() {
-        awaitingChoice = false;
         choiceSet = null;
     }
 
@@ -236,9 +241,9 @@ class GameImpl implements Game {
         }
 
         @Override
-        public void swap(Side side) {
+        public void swap() {
             swapped = !swapped;
-            listenerGroup.stoneSwapped(side);
+            listenerGroup.stoneSwapped();
         }
 
         @Override
@@ -270,7 +275,6 @@ class GameImpl implements Game {
         @Override
         public void requestChoice(ChoiceSet choiceSet, Side side) {
             currentSide = side;
-            awaitingChoice = true;
             GameImpl.this.choiceSet = choiceSet;
         }
 
@@ -283,7 +287,6 @@ class GameImpl implements Game {
         public void end(Result.Type resultType, Side winningSide, String description) {
             ended = true;
             started = false;
-            awaitingChoice = false;
             choiceSet = null;
             currentSide = null;
             result = new Result(resultType, winningSide, description);

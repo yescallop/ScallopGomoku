@@ -3,7 +3,6 @@ package cn.yescallop.gomoku.player;
 import cn.yescallop.gomoku.game.Board;
 import cn.yescallop.gomoku.game.ChoiceSet;
 import cn.yescallop.gomoku.game.Side;
-import cn.yescallop.gomoku.game.StoneType;
 
 import java.util.Objects;
 
@@ -14,7 +13,6 @@ public abstract class AbstractPlayer implements Player {
 
     protected final String name;
     protected Side side = null;
-    protected StoneType stone;
 
     /**
      * Constructs a player with specified name.
@@ -33,7 +31,6 @@ public abstract class AbstractPlayer implements Player {
         Objects.requireNonNull(side);
         if (this.side == null) {
             this.side = side;
-            stone = side == Side.FIRST ? StoneType.BLACK : StoneType.WHITE;
         } else throw new IllegalStateException("Side already set");
     }
 
@@ -55,12 +52,6 @@ public abstract class AbstractPlayer implements Player {
     @Override
     public final void choiceRequested(ChoiceSet choiceSet, Side side) {
         //ignored
-    }
-
-    @Override
-    public final void stoneSwapped(Side side) {
-        stone = stone.opposite();
-        stoneSwapped();
     }
 
     @Override

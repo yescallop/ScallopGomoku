@@ -20,10 +20,10 @@ public class GomokuPro extends StandardGomoku {
             return;
         }
         if (index == 0 &&
-                RuleHelper.chebyshevDistToCenter(grid, boardSize) != 0) {
+                RuleHelper.chebyshevDistToCenter(grid) != 0) {
             throw new IllegalMoveException("The first move not in the center");
         } else if (index == 2 &&
-                RuleHelper.chebyshevDistToCenter(grid, boardSize) < 5) {
+                RuleHelper.chebyshevDistToCenter(grid) < 5) {
             throw new IllegalMoveException("The third move inside central 5x5 area");
         }
         controller.makeMove(grid);

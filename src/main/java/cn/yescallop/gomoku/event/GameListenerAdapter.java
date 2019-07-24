@@ -39,7 +39,7 @@ public abstract class GameListenerAdapter implements GameListener {
     }
 
     @Override
-    public void stoneSwapped(Side side) {
+    public void stoneSwapped() {
 
     }
 

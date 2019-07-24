@@ -58,10 +58,8 @@ public interface GameListener {
 
     /**
      * Called when the stones are swapped.
-     *
-     * @param side the side which made the swap, null for a judge.
      */
-    void stoneSwapped(Side side);
+    void stoneSwapped();
 
     /**
      * Called when the game ends.

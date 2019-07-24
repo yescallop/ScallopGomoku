@@ -12,25 +12,26 @@ class GameThread extends Thread {
     private final GameImpl game;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private final long moveTimeout;
     private final long[] moveTimeRemaining;
-    private final long[] gameTimeRemaining;
+    final long[] gameTimeRemaining;
 
     GameThread(GameImpl game) {
         super("GameThread");
         this.game = game;
-        moveTimeout = game.moveTimeout();
-        moveTimeRemaining = moveTimeout == 0 ? null : new long[]{moveTimeout, moveTimeout};
-        long gameTimeout = game.gameTimeout();
-        gameTimeRemaining = gameTimeout == 0 ? null : new long[]{gameTimeout, gameTimeout};
+        moveTimeRemaining = game.moveTimeout == 0 ?
+                null : new long[]{game.moveTimeout, game.moveTimeout};
+        gameTimeRemaining = game.gameTimeout == 0 ?
+                null : new long[]{game.gameTimeout, game.gameTimeout};
     }
 
     @Override
     public void run() {
-        while (!game.isEnded()) {
-            Side side = game.currentSide();
-            long startTime = System.currentTimeMillis();
-            try {
+        Side side = null;
+        long startTime = 0;
+        try {
+            while (!game.isEnded()) {
+                side = game.currentSide();
+                startTime = System.currentTimeMillis();
                 if (game.isAwaitingChoice()) {
                     requestChoice(game.choiceSet(), side);
                 } else {
@@ -40,31 +41,30 @@ class GameThread extends Thread {
                 if (gameTimeRemaining != null)
                     gameTimeRemaining[side.index()] -= elapsedTime;
                 if (moveTimeRemaining != null)
-                    moveTimeRemaining[side.index()] = moveTimeout;
-            } catch (InterruptedException e) {
-                // Thread interrupted
-                break;
-            } catch (ExecutionException | IllegalMoveException | IllegalChoiceException e) {
-                long elapsedTime = System.currentTimeMillis() - startTime;
-                // Player exception
-                game.listenerGroup.exceptionCaught(e, side);
-
-                if (gameTimeRemaining != null)
-                    gameTimeRemaining[side.index()] -= elapsedTime;
-                if (moveTimeRemaining != null)
-                    moveTimeRemaining[side.index()] -= elapsedTime;
-            } catch (TimeoutException e) {
-                // Timeout
-                game.controller.end(Result.Type.TIMEOUT, side.opposite());
-            } catch (Exception e) {
-                // Unexpected exception
-                game.listenerGroup.exceptionCaught(e, null);
-                game.controller.end(Result.Type.EXCEPTION, null);
+                    moveTimeRemaining[side.index()] = game.moveTimeout;
             }
-        }
-        executor.shutdown();
-        if (!game.isEnded())
+        } catch (InterruptedException e) {
+            // Thread interrupted
             game.controller.end(Result.Type.INTERRUPT, null);
+        } catch (ExecutionException | IllegalMoveException | IllegalChoiceException e) {
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            // Player exception
+            game.listenerGroup.exceptionCaught(e, side);
+
+            if (gameTimeRemaining != null)
+                gameTimeRemaining[side.index()] -= elapsedTime;
+            if (moveTimeRemaining != null)
+                moveTimeRemaining[side.index()] -= elapsedTime;
+        } catch (TimeoutException e) {
+            // Timeout
+            game.controller.end(Result.Type.TIMEOUT, side.opposite());
+        } catch (Exception e) {
+            // Unexpected exception
+            game.listenerGroup.exceptionCaught(e, null);
+            game.controller.end(Result.Type.EXCEPTION, null);
+        } finally {
+            executor.shutdown();
+        }
     }
 
     private void requestMove(Side side)
@@ -92,11 +92,11 @@ class GameThread extends Thread {
         int choice = getChoice(choiceSet, side);
 
         if (!choiceSet.validate(choice))
-            throw new IllegalChoiceException("Illegal choice");
+            throw new IllegalChoiceException();
 
         game.listenerGroup.choiceMade(choiceSet, choice, side);
-        game.resetChoice();
         game.judge.processChoice(choice, side);
+        game.resetChoice();
     }
 
     private long sideTimeout(Side side) {
@@ -122,11 +122,11 @@ class GameThread extends Thread {
     }
 
     private int getChoice(ChoiceSet choiceSet, Side side) throws InterruptedException, ExecutionException, TimeoutException {
-        Future<Integer> choiceFuture = executor.submit(() -> game.player(side).requestChoice(choiceSet, moveTimeout));
+        Future<Integer> choiceFuture = executor.submit(() -> game.player(side).requestChoice(choiceSet, game.moveTimeout));
         int choice;
 
         try {
-            choice = (moveTimeout == 0) ? choiceFuture.get() : choiceFuture.get(moveTimeout, TimeUnit.MILLISECONDS);
+            choice = (game.moveTimeout == 0) ? choiceFuture.get() : choiceFuture.get(game.moveTimeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException | TimeoutException e) {
             choiceFuture.cancel(true);
             throw e;

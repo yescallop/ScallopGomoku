@@ -2,6 +2,7 @@ package cn.yescallop.gomoku.console;
 
 import cn.yescallop.gomoku.game.Board;
 import cn.yescallop.gomoku.game.ChoiceSet;
+import cn.yescallop.gomoku.game.Game;
 import cn.yescallop.gomoku.player.PlayerAdapter;
 
 import java.io.BufferedReader;
@@ -15,6 +16,8 @@ import java.util.StringJoiner;
 public class ConsolePlayer extends PlayerAdapter {
 
     private static final BufferedReader READER = new BufferedReader(new InputStreamReader(System.in));
+
+    private Game game;
 
     public ConsolePlayer(String name) {
         super(name);
@@ -44,8 +47,13 @@ public class ConsolePlayer extends PlayerAdapter {
     }
 
     @Override
+    public void gameStarted(Game game) {
+        this.game = game;
+    }
+
+    @Override
     public Board.Point requestMove(long timeoutMillis) throws Exception {
-        System.out.printf("[%s] [%s] Please enter your move: ", name, stone);
+        System.out.printf("[%s] [%s] Please enter your move: ", name, game.stoneTypeBySide(side));
         try {
             return Board.Point.parse(readLine());
         } catch (IllegalArgumentException e) {
@@ -58,9 +66,12 @@ public class ConsolePlayer extends PlayerAdapter {
         System.out.println("----- CHOICE REQUEST -----");
         printChoices(choiceSet);
         System.out.println("--------------------------");
-        System.out.printf("[%s] [%s] Please enter your choice: ", name, stone);
+        System.out.printf("[%s] [%s] Please enter your choice: ", name, game.stoneTypeBySide(side));
 
-        return Integer.parseInt(readLine()) - 1;
+        int choice = Integer.parseInt(readLine());
+        if (choiceSet.type() != ChoiceSet.Type.MOVE_COUNT)
+            choice--;
+        return choice;
     }
 
     private void printChoices(ChoiceSet choiceSet) {

@@ -21,12 +21,12 @@ public class Swap extends StandardGomoku {
             controller.requestChoice(
                     ChoiceSet.ofStrings("Choose Black", "Choose White"),
                     Side.SECOND);
-        } else controller.swap(null);
+        } else controller.swap();
     }
 
     @Override
     public void processChoice(int choice, Side side) {
-        if (choice == 0) controller.swap(side);
+        if (choice == 0) controller.swap();
         controller.setSideByStoneType(StoneType.WHITE);
     }
 }

@@ -36,7 +36,7 @@ public class Board {
 
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                matrix[y][x] = new Grid(x, y);
+                matrix[y][x] = new Grid(this, x, y);
             }
         }
 
@@ -104,29 +104,35 @@ public class Board {
      */
     public static class Grid {
 
+        private final Board board;
         private final int x, y;
 
         /**
          * An array holding the adjacent grid instances,
          * which is initialized in the constructor and should never be modified.
          * <p>
-         * The mapping from indexes to directions can be found in the class Board as integer constants.
+         * The mapping from indexes to directions can be found in the enum Direction.
          */
         private final Grid[] adjacentGrids = new Grid[8];
 
         /**
-         * The stone of this grid, null if unoccupied.
+         * The stone type of this grid, or null if unoccupied.
          */
         private StoneType stone = null;
 
         /**
-         * The move index of this grid starting from 1, 0 if unoccupied.
+         * The move index of this grid starting from 1, or 0 if unoccupied.
          */
         private int moveIndex = 0;
 
-        private Grid(int x, int y) {
+        private Grid(Board board, int x, int y) {
+            this.board = board;
             this.x = x;
             this.y = y;
+        }
+
+        public Board board() {
+            return board;
         }
 
         public int x() {

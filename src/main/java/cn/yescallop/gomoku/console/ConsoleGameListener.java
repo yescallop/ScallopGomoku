@@ -5,6 +5,8 @@ import cn.yescallop.gomoku.game.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Duration;
+import java.util.OptionalLong;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -20,15 +22,16 @@ public class ConsoleGameListener extends GameListenerAdapter {
     public void gameStarted(Game game) {
         this.game = game;
         LOGGER.info("----- GAME SETTINGS ----");
-        LOGGER.info("Game timeout: " + game.gameTimeout());
-        LOGGER.info("Move timeout: " + game.moveTimeout());
+        LOGGER.info("Game timeout: " + timeoutString(game.gameTimeout()));
+        LOGGER.info("Move timeout: " + timeoutString(game.moveTimeout()));
+        LOGGER.info("Strict mode: " + (game.isStrict() ? "Enabled" : "Disabled"));
         LOGGER.info("Rule: " + game.rule().name());
         LOGGER.info("----- GAME STARTED -----");
     }
 
     @Override
-    public void stoneSwapped(Side side) {
-        LOGGER.info((side == null ? "Judge" : game.playerNameBySide(side)) + " swapped the stones.");
+    public void stoneSwapped() {
+        LOGGER.info("The stones are swapped.");
     }
 
     @Override
@@ -45,17 +48,24 @@ public class ConsoleGameListener extends GameListenerAdapter {
 
     @Override
     public void exceptionCaught(Throwable t, Side side) {
-        String name = game.playerNameBySide(side);
-        StoneType stone = game.stoneTypeBySide(side);
-        if (t instanceof IllegalMoveException) {
-            LOGGER.warn("Invalid move by {} ({}): {}", stone, name, t.getMessage());
-        } else if (t instanceof IllegalChoiceException) {
-            LOGGER.warn("Invalid choice by {} ({}): {}", stone, name, t.getMessage());
-        } else if (t instanceof ExecutionException) {
-            t = t.getCause();
-            LOGGER.warn(t.getClass().getSimpleName() + " occurred by {} ({}): {}", stone, name, t.getMessage());
+        if (side != null) {
+            String name = game.playerNameBySide(side);
+            StoneType stone = game.stoneTypeBySide(side);
+            if (t instanceof IllegalMoveException) {
+                LOGGER.warn("Invalid move by {} ({}): {}", stone, name, t.getMessage());
+            } else if (t instanceof IllegalChoiceException) {
+                LOGGER.warn("Invalid choice by {} ({})", stone, name);
+            } else if (t instanceof ExecutionException) {
+                t = t.getCause();
+                LOGGER.warn(t.getClass().getSimpleName() + " occurred by {} ({}): {}", stone, name, t.getMessage());
+            }
         } else {
             LOGGER.error("Fatal error: ", t);
         }
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private static String timeoutString(OptionalLong t) {
+        return t.isPresent() ? Duration.ofMillis(t.getAsLong()).toString() : "N/A";
     }
 }

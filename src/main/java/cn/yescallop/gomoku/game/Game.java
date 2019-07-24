@@ -4,6 +4,7 @@ import cn.yescallop.gomoku.event.GameListener;
 import cn.yescallop.gomoku.player.Player;
 import cn.yescallop.gomoku.rule.Rule;
 
+import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -26,7 +27,7 @@ public interface Game {
     /**
      * Starts the game.
      *
-     * @return the future of this Game.
+     * @return the future of this game.
      */
     Future start();
 
@@ -63,7 +64,8 @@ public interface Game {
     /**
      * Gets the result of the game.
      *
-     * @return the result of this game, null if not ended.
+     * @return the result of this game,
+     * or null if the game is not ended.
      */
     Result result();
 
@@ -75,7 +77,10 @@ public interface Game {
     Board board();
 
     /**
-     * Reports a forbidden move.
+     * Reports a forbidden move of Black.
+     * If the report succeeds, the game will end with
+     * White as the winner.
+     * <p>
      * It is not recommended to report yourself.
      *
      * @param point the point where the move was made,
@@ -87,16 +92,24 @@ public interface Game {
     /**
      * Gets the game timeout.
      *
-     * @return the game timeout.
+     * @return the game timeout in milliseconds.
      */
-    long gameTimeout();
+    OptionalLong gameTimeout();
 
     /**
      * Gets the move timeout.
      *
-     * @return the move timeout.
+     * @return the move timeout in milliseconds.
      */
-    long moveTimeout();
+    OptionalLong moveTimeout();
+
+    /**
+     * Gets the remaining time of a side.
+     *
+     * @param side the side.
+     * @return the remaining time in milliseconds.
+     */
+    OptionalLong gameTimeRemaining(Side side);
 
     /**
      * Gets whether this game is strict.
@@ -252,10 +265,8 @@ public interface Game {
 
         /**
          * Swaps control of the stones.
-         *
-         * @param side the side which made the swap.
          */
-        void swap(Side side);
+        void swap();
 
         /**
          * Switches the turn to move.

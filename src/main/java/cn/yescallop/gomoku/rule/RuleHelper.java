@@ -17,7 +17,7 @@ public final class RuleHelper {
      * The maximum check depth of the interrelationship
      * of the forbidden moves.
      */
-    private static final int FORBIDDEN_MOVE_MAX_CHECK_DEPTH = 4;
+    private static final int FORBIDDEN_MOVE_MAX_CHECK_DEPTH = 5;
 
     private RuleHelper() {
         // no instance
@@ -64,12 +64,11 @@ public final class RuleHelper {
      * Calculates the Chebyshev Distance
      * from the grid to the board center.
      *
-     * @param grid      the grid.
-     * @param boardSize the board size.
+     * @param grid the grid.
      * @return the Chebyshev Distance.
      */
-    public static int chebyshevDistToCenter(Board.Grid grid, int boardSize) {
-        int center = (boardSize - 1) / 2;
+    public static int chebyshevDistToCenter(Board.Grid grid) {
+        int center = (grid.board().size() - 1) / 2;
         int dx = Math.abs(grid.x() - center);
         int dy = Math.abs(grid.y() - center);
         return Math.max(dx, dy);
@@ -87,8 +86,8 @@ public final class RuleHelper {
             return null;
         int activeThrees = 0;
         int fours = 0;
-        for (StoneShape p : shapes) {
-            switch (p) {
+        for (StoneShape s : shapes) {
+            switch (s) {
                 case OVERLINE:
                     return "Overline";
                 case ACTIVE_THREE:
@@ -102,10 +101,10 @@ public final class RuleHelper {
         if (activeThrees >= 2 || fours >= 2) {
             StringJoiner sj = new StringJoiner("-");
             for (int i = 0; i < fours; i++) {
-                sj.add(String.valueOf('4'));
+                sj.add("4");
             }
             for (int i = 0; i < activeThrees; i++) {
-                sj.add(String.valueOf('3'));
+                sj.add("3");
             }
             return sj + " Forbidden Move";
         }
@@ -124,8 +123,8 @@ public final class RuleHelper {
             return false;
         int activeThrees = 0;
         int fours = 0;
-        for (StoneShape p : shapes) {
-            switch (p) {
+        for (StoneShape s : shapes) {
+            switch (s) {
                 case OVERLINE:
                     return true;
                 case ACTIVE_THREE:
@@ -202,9 +201,9 @@ public final class RuleHelper {
                     Board.Grid aheadFirst = grid.adjacent(ds[i], fwdDsp[0] + 1);
                     Board.Grid aheadSecond = aheadFirst.adjacent(ds[i], fwdDsp[1] + 1);
                     Board.Grid behind = grid.adjacent(ds[i ^ 1], oppDsp[0] + 1);
-                    if ((cfm(aheadFirst, checked)) ||
-                            (cfm(aheadSecond, checked)) ||
-                            (cfm(behind, checked))) {
+                    if (cfm(aheadFirst, checked) ||
+                            cfm(aheadSecond, checked) ||
+                            cfm(behind, checked)) {
                         return;
                     }
 
@@ -232,7 +231,7 @@ public final class RuleHelper {
      * @return whether there's a forbidden move,
      */
     private static boolean cfm(Board.Grid grid, GridNode checked) {
-        if (checked != null && (checked.search(grid) || checked.index > FORBIDDEN_MOVE_MAX_CHECK_DEPTH))
+        if (checked != null && (checked.index >= FORBIDDEN_MOVE_MAX_CHECK_DEPTH || checked.search(grid)))
             return false;
 
         return checkForbiddenMove(searchShapes(grid, checked));
@@ -250,7 +249,7 @@ public final class RuleHelper {
      * @param res     an array of length 2 to store the result,
      *                in which the first element is the size of
      *                the first row, and the second element
-     *                is the size of the second row (-1 if no
+     *                is the size of the second row (or -1 if no
      *                empty grid is reached).
      * @return true if the shape is active in the direction,
      * or else false.
@@ -283,9 +282,9 @@ public final class RuleHelper {
     }
 
     private static class GridNode {
-        Board.Grid value;
-        GridNode prev;
-        int index;
+        final Board.Grid value;
+        final GridNode prev;
+        final int index;
 
         GridNode(Board.Grid value, GridNode prev) {
             this.value = value;

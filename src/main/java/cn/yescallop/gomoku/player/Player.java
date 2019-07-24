@@ -30,7 +30,7 @@ public interface Player extends GameListener {
      *
      * @param timeoutMillis timeout in milliseconds, 0 for no timeout.
      * @return the move requested.
-     * @throws InterruptedException if the current thread is interrupted while waiting.
+     * @throws InterruptedException if the current thread was interrupted while waiting.
      */
     Board.Point requestMove(long timeoutMillis) throws Exception;
 
@@ -40,7 +40,7 @@ public interface Player extends GameListener {
      * @param choiceSet     the choice set.
      * @param timeoutMillis timeout in milliseconds, 0 for no timeout.
      * @return the choice requested.
-     * @throws InterruptedException if the current thread is interrupted while waiting.
+     * @throws InterruptedException if the current thread was interrupted while waiting.
      */
     int requestChoice(ChoiceSet choiceSet, long timeoutMillis) throws Exception;
 
@@ -65,9 +65,4 @@ public interface Player extends GameListener {
      * @param choice    the choice made.
      */
     void opponentChoiceMade(ChoiceSet choiceSet, int choice);
-
-    /**
-     * Called when the stones are swapped.
-     */
-    void stoneSwapped();
 }
