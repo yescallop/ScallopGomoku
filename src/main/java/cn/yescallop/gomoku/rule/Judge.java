@@ -23,18 +23,20 @@ public interface Judge {
     /**
      * Processes a move made by the player.
      *
-     * @param grid the grid where the move is made.
-     * @param side the side of the move.
+     * @param index the move index
+     * @param grid  the grid where the move is made.
+     * @param side  the side of the move.
      * @throws IllegalMoveException if the move is illegal.
      */
-    void processMove(Board.Grid grid, Side side) throws IllegalMoveException;
+    void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException;
 
     /**
      * Processes a choice made by the player.
      *
+     * @param index  the choice index.
      * @param choice the choice made by the player.
      * @param side   the side of the choice.
      */
-    void processChoice(int choice, Side side);
+    void processChoice(int index, int choice, Side side);
 
 }

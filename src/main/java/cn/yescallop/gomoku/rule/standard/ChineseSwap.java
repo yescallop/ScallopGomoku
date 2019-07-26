@@ -9,10 +9,9 @@ import cn.yescallop.gomoku.game.*;
  */
 public class ChineseSwap extends StandardGomoku {
     @Override
-    public void processMove(Board.Grid grid, Side side) throws IllegalMoveException {
-        int index = game.currentMoveIndex();
-        if (index != 0) {
-            super.processMove(grid, side);
+    public void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException {
+        if (index != 1) {
+            super.processMove(index, grid, side);
             return;
         }
         controller.makeMove(grid);
@@ -22,7 +21,7 @@ public class ChineseSwap extends StandardGomoku {
     }
 
     @Override
-    public void processChoice(int choice, Side side) {
+    public void processChoice(int index, int choice, Side side) {
         if (choice == 0) controller.swap();
         controller.setSideByStoneType(StoneType.WHITE);
     }

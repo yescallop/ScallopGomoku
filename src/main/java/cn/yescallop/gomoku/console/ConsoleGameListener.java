@@ -35,6 +35,13 @@ public class ConsoleGameListener extends GameListenerAdapter {
     }
 
     @Override
+    public void moveMade(Board.Grid move, Side side) {
+        String name = game.playerNameBySide(side);
+        StoneType stone = game.stoneTypeBySide(side);
+        LOGGER.info("{} ({}) made a move: {}", stone, name, move.pointString());
+    }
+
+    @Override
     public void gameEnded(Result result) {
         Side side = result.winningSide();
 

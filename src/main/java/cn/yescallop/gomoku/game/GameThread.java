@@ -1,5 +1,7 @@
 package cn.yescallop.gomoku.game;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -14,6 +16,11 @@ class GameThread extends Thread {
 
     private final long[] moveTimeRemaining;
     final long[] gameTimeRemaining;
+
+    private int multipleMovesNeeded = 0;
+    private List<Board.Grid> multipleMoves;
+
+    private int choiceIndex = 0;
 
     GameThread(GameImpl game) {
         super("GameThread");
@@ -64,6 +71,11 @@ class GameThread extends Thread {
         executor.shutdown();
     }
 
+    void multipleMovesRequested(int count) {
+        multipleMovesNeeded = count;
+        multipleMoves = new ArrayList<>(count);
+    }
+
     private void requestMove(Side side)
             throws InterruptedException, ExecutionException, TimeoutException, IllegalMoveException {
         game.listenerGroup.moveRequested(side);
@@ -80,7 +92,23 @@ class GameThread extends Thread {
         if (!grid.isEmpty())
             throw new IllegalMoveException("Moving into an occupied grid");
 
-        game.judge.processMove(grid, side);
+        if (multipleMovesNeeded > 0) {
+            for (Board.Grid m : multipleMoves) {
+                if (grid == m)
+                    throw new IllegalMoveException("Duplicate multiple moves");
+                if (grid.equalsSymmetrically(m))
+                    throw new IllegalMoveException("Symmetrical multiple moves");
+            }
+            multipleMoves.add(grid);
+            game.listenerGroup.moveOffered(grid, side);
+            if (--multipleMovesNeeded == 0) {
+                game.controller.requestChoice(
+                        ChoiceSet.ofMoves(multipleMoves.toArray(Board.Grid[]::new)),
+                        side.opposite()
+                );
+                multipleMoves = null;
+            }
+        } else game.judge.processMove(game.currentMoveIndex() + 1, grid, side);
     }
 
     private void requestChoice(ChoiceSet choiceSet, Side side)
@@ -91,9 +119,14 @@ class GameThread extends Thread {
         if (!choiceSet.validate(choice))
             throw new IllegalChoiceException();
 
-        game.listenerGroup.choiceMade(choiceSet, choice, side);
-        game.judge.processChoice(choice, side);
         game.resetChoice();
+        game.listenerGroup.choiceMade(choiceSet, choice, side);
+        if (choiceSet.type() == ChoiceSet.Type.MOVES) {
+            Board.Grid move = choiceSet.moves()[choice];
+            game.controller.switchSide();
+            game.controller.makeMove(move);
+            game.controller.switchSide();
+        } else game.judge.processChoice(++choiceIndex, choice, side);
     }
 
     private long sideTimeout(Side side) {

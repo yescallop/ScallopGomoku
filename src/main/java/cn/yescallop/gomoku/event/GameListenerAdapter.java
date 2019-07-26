@@ -29,6 +29,11 @@ public abstract class GameListenerAdapter implements GameListener {
     }
 
     @Override
+    public void moveOffered(Board.Grid move, Side side) {
+
+    }
+
+    @Override
     public void choiceRequested(ChoiceSet choiceSet, Side side) {
 
     }

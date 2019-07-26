@@ -40,6 +40,15 @@ public interface GameListener {
     void moveMade(Board.Grid move, Side side);
 
     /**
+     * Called when a move is offered as part of
+     * a set of multiple moves.
+     *
+     * @param move the move.
+     * @param side the side which offered the move.
+     */
+    void moveOffered(Board.Grid move, Side side);
+
+    /**
      * Called when a choice is requested.
      *
      * @param choiceSet the choice set.

@@ -32,6 +32,11 @@ class ListenerGroup extends HashSet<GameListener> implements GameListener {
     }
 
     @Override
+    public void moveOffered(Board.Grid move, Side side) {
+        forEach(l -> l.moveOffered(move, side));
+    }
+
+    @Override
     public void choiceRequested(ChoiceSet choiceSet, Side side) {
         forEach(l -> l.choiceRequested(choiceSet, side));
     }

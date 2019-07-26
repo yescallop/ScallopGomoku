@@ -13,17 +13,16 @@ import cn.yescallop.gomoku.rule.RuleHelper;
 public class GomokuPro extends StandardGomoku {
 
     @Override
-    public void processMove(Board.Grid grid, Side side) throws IllegalMoveException {
-        int index = game.currentMoveIndex();
-        if (index > 2) {
-            super.processMove(grid, side);
+    public void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException {
+        if (index > 3) {
+            super.processMove(index, grid, side);
             return;
         }
-        if (index == 0 &&
+        if (index == 1 &&
                 RuleHelper.chebyshevDistToCenter(grid) != 0) {
             throw new IllegalMoveException("The first move not in the center");
-        } else if (index == 2 &&
-                RuleHelper.chebyshevDistToCenter(grid) < 5) {
+        } else if (index == 3 &&
+                RuleHelper.chebyshevDistToCenter(grid) < 3) {
             throw new IllegalMoveException("The third move inside central 5x5 area");
         }
         controller.makeMove(grid);

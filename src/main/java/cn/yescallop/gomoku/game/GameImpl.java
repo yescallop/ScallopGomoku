@@ -268,8 +268,12 @@ class GameImpl implements Game {
         }
 
         @Override
-        public void requestMultipleMoves(int count) {
-            // TODO: Implements multiple moves
+        public void requestMultipleMoves(int count, Side side) {
+            if (count < 2)
+                throw new IllegalArgumentException("count < 2");
+            currentSide = side;
+            gameThread.multipleMovesRequested(count);
+            listenerGroup.multipleMovesRequested(count, currentSide);
         }
 
         @Override

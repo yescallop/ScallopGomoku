@@ -175,7 +175,15 @@ public class Board {
 
         @Override
         public String toString() {
-            return "Grid{" + ((char) ('A' + x)) + (y + 1) + ", " + stone + "}";
+            return "Grid{" + pointString() + ", " + stone + "}";
+        }
+
+        public String pointString() {
+            return ((char) ('A' + x)) + String.valueOf(y + 1);
+        }
+
+        public boolean equalsSymmetrically(Grid other) {
+            return (x == other.x || x + other.x + 1 == board.size) && (y == other.y || y + other.y + 1 == board.size);
         }
     }
 

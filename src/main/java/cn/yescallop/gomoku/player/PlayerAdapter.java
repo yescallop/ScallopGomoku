@@ -24,6 +24,11 @@ public abstract class PlayerAdapter extends AbstractPlayer {
     }
 
     @Override
+    public void opponentMoveOffered(Board.Grid move) {
+
+    }
+
+    @Override
     public void opponentChoiceMade(ChoiceSet choiceSet, int choice) {
 
     }

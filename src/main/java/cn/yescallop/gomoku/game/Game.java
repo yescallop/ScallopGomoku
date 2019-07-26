@@ -298,8 +298,9 @@ public interface Game {
          * Requests multiple moves.
          *
          * @param count the count of moves requested.
+         * @param side  the side requested to move.
          */
-        void requestMultipleMoves(int count);
+        void requestMultipleMoves(int count, Side side);
 
         /**
          * Requests a choice.

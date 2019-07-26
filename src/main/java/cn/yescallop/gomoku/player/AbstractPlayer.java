@@ -61,6 +61,12 @@ public abstract class AbstractPlayer implements Player {
     }
 
     @Override
+    public final void moveOffered(Board.Grid move, Side side) {
+        if (side != this.side)
+            opponentMoveOffered(move);
+    }
+
+    @Override
     public final void choiceMade(ChoiceSet choiceSet, int choice, Side side) {
         if (side != this.side)
             opponentChoiceMade(choiceSet, choice);

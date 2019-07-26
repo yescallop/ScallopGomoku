@@ -59,6 +59,14 @@ public interface Player extends GameListener {
     void opponentMoveMade(Board.Grid move);
 
     /**
+     * Called when the opponent offers a move
+     * as part of a set of multiple moves.
+     *
+     * @param move the move.
+     */
+    void opponentMoveOffered(Board.Grid move);
+
+    /**
      * Called when the opponent makes a choice.
      *
      * @param choiceSet the choice set.

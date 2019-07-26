@@ -2,6 +2,7 @@ package cn.yescallop.gomoku.rule;
 
 import cn.yescallop.gomoku.game.Board;
 import cn.yescallop.gomoku.game.Direction;
+import cn.yescallop.gomoku.game.IllegalMoveException;
 import cn.yescallop.gomoku.game.StoneType;
 
 import java.util.LinkedList;
@@ -211,11 +212,6 @@ public final class RuleHelper {
                     return;
                 }
             } else if (total == 4) {
-                // Check forbidden move
-                Board.Grid ahead = grid.adjacent(ds[i], fwdDsp[0] + 1);
-                if (cfm(ahead, checked))
-                    continue;
-
                 res.add(StoneShape.FOUR);
                 if (row == 4) // Avoid double Fours
                     return;
@@ -279,6 +275,23 @@ public final class RuleHelper {
         }
         return res[1] == 0 ||
                 ((grid = grid.adjacent(d)) == null || grid.stone() != StoneType.BLACK);
+    }
+
+    public static void validateStandardOpening(Board.Grid grid, int index) throws IllegalMoveException {
+        switch (index) {
+            case 1:
+                if (chebyshevDistToCenter(grid) != 0)
+                    throw new IllegalMoveException("The first move not in the center");
+                break;
+            case 2:
+                if (chebyshevDistToCenter(grid) > 1)
+                    throw new IllegalMoveException("The second move outside central 3x3 area");
+                break;
+            case 3:
+                if (chebyshevDistToCenter(grid) > 2)
+                    throw new IllegalMoveException("The third move outside central 5x5 area");
+                break;
+        }
     }
 
     private static class GridNode {

@@ -52,6 +52,12 @@ public class ConsolePlayer extends PlayerAdapter {
     }
 
     @Override
+    public void multipleMovesRequested(int count) {
+        System.out.printf("----- MULTIPLE MOVES OF %d REQUESTED -----", count);
+        System.out.println();
+    }
+
+    @Override
     public Board.Point requestMove(long timeoutMillis) throws Exception {
         System.out.printf("[%s] [%s] Please enter your move: ", name, game.stoneTypeBySide(side));
         try {
@@ -85,10 +91,10 @@ public class ConsolePlayer extends PlayerAdapter {
                 break;
             case MOVES:
                 System.out.println("Choose a move of the opponent from below:");
-                Board.Point[] moves = choiceSet.moves();
+                Board.Grid[] moves = choiceSet.moves();
                 StringJoiner sj = new StringJoiner(" ");
                 for (int i = 0; i < moves.length; i++) {
-                    sj.add(String.format("[%d] %s", i + 1, moves[i]));
+                    sj.add(String.format("[%d] %s", i + 1, moves[i].pointString()));
                 }
                 System.out.println(sj);
                 break;

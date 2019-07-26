@@ -19,6 +19,12 @@ public final class StandardRules {
 
     // Renju Rules
     public static final Rule STANDARD_RENJU = Rule.createRenju("Standard Renju", StandardRenju::new);
+    public static final Rule RIF = Rule.createRenju("RIF", RIF::new);
+    public static final Rule SAKATA = Rule.createRenju("Sakata", Sakata::new);
+    public static final Rule YAMAGUCHI = Rule.createRenju("Yamaguchi", Yamaguchi::new);
+    public static final Rule TARANNIKOV = Rule.createRenju("Tarannikov", Tarannikov::new);
+    public static final Rule TARAGUCHI = Rule.createRenju("Taraguchi", () -> new Taraguchi(5));
+    public static final Rule SOOSYRV_8 = Rule.createRenju("Soosyrv-8", () -> new Soosyrv(8));
 
     private StandardRules() {
         // no instance

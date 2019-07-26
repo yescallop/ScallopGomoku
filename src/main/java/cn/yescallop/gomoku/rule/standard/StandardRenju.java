@@ -15,7 +15,7 @@ import java.util.List;
 public class StandardRenju extends AbstractJudge {
 
     @Override
-    public void processMove(Board.Grid grid, Side side) throws IllegalMoveException {
+    public void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException {
         controller.makeMove(grid);
         if (grid.stone() == StoneType.WHITE) {
             if (RuleHelper.longestRowSize(grid) >= 5) {
@@ -39,11 +39,11 @@ public class StandardRenju extends AbstractJudge {
                 return;
             }
         }
-//        controller.switchSide();
+        controller.switchSide();
     }
 
     @Override
-    public void processChoice(int choice, Side side) {
+    public void processChoice(int index, int choice, Side side) {
 
     }
 }

@@ -18,7 +18,7 @@ import cn.yescallop.gomoku.rule.RuleHelper;
 public class StandardGomoku extends AbstractJudge {
 
     @Override
-    public void processMove(Board.Grid grid, Side side) throws IllegalMoveException {
+    public void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException {
         controller.makeMove(grid);
         if (RuleHelper.longestRowSize(grid) == 5) {
             controller.end(Result.Type.ROW_COMPLETED, side);
@@ -28,7 +28,7 @@ public class StandardGomoku extends AbstractJudge {
     }
 
     @Override
-    public void processChoice(int choice, Side side) {
+    public void processChoice(int index, int choice, Side side) {
 
     }
 }
