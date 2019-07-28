@@ -3,7 +3,6 @@ package cn.yescallop.gomoku.rule.standard;
 import cn.yescallop.gomoku.game.*;
 import cn.yescallop.gomoku.rule.AbstractJudge;
 import cn.yescallop.gomoku.rule.RuleHelper;
-import cn.yescallop.gomoku.rule.StoneShape;
 
 import java.util.List;
 

@@ -25,14 +25,14 @@ class GameBuilderImpl implements Game.Builder {
     }
 
     @Override
-    public GameBuilderImpl addListener(GameListener listener) {
+    public GameBuilderImpl listener(GameListener listener) {
         listenerGroup.add(listener);
         return this;
     }
 
     @Override
-    public GameBuilderImpl addPlayer(Side side, Player player) {
-        players[side.index()] = player;
+    public GameBuilderImpl player(Side side, Player player) {
+        players[side.ordinal()] = player;
         return this;
     }
 

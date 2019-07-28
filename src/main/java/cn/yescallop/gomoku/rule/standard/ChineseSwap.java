@@ -8,6 +8,7 @@ import cn.yescallop.gomoku.game.*;
  * @author Scallop Ye
  */
 public class ChineseSwap extends StandardGomoku {
+
     @Override
     public void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException {
         if (index != 1) {

@@ -44,9 +44,9 @@ class GameThread extends Thread {
                 }
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 if (gameTimeRemaining != null)
-                    gameTimeRemaining[side.index()] -= elapsedTime;
+                    gameTimeRemaining[side.ordinal()] -= elapsedTime;
                 if (moveTimeRemaining != null)
-                    moveTimeRemaining[side.index()] = game.moveTimeout;
+                    moveTimeRemaining[side.ordinal()] = game.moveTimeout;
             } catch (InterruptedException e) {
                 // Thread interrupted
                 game.controller.end(Result.Type.INTERRUPT, null);
@@ -56,9 +56,9 @@ class GameThread extends Thread {
                 game.listenerGroup.exceptionCaught(e, side);
 
                 if (gameTimeRemaining != null)
-                    gameTimeRemaining[side.index()] -= elapsedTime;
+                    gameTimeRemaining[side.ordinal()] -= elapsedTime;
                 if (moveTimeRemaining != null)
-                    moveTimeRemaining[side.index()] -= elapsedTime;
+                    moveTimeRemaining[side.ordinal()] -= elapsedTime;
             } catch (TimeoutException e) {
                 // Timeout
                 game.controller.end(Result.Type.TIMEOUT, side.opposite());
@@ -130,7 +130,7 @@ class GameThread extends Thread {
     }
 
     private long sideTimeout(Side side) {
-        int i = side.index();
+        int i = side.ordinal();
         if (gameTimeRemaining == null)
             return moveTimeRemaining == null ? 0 : moveTimeRemaining[i];
         return moveTimeRemaining == null ? gameTimeRemaining[i] :

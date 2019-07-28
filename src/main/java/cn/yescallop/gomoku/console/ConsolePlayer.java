@@ -5,17 +5,16 @@ import cn.yescallop.gomoku.game.ChoiceSet;
 import cn.yescallop.gomoku.game.Game;
 import cn.yescallop.gomoku.player.PlayerAdapter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringJoiner;
+import java.io.Reader;
 
 /**
  * @author Scallop Ye
  */
 public class ConsolePlayer extends PlayerAdapter {
 
-    private static final BufferedReader READER = new BufferedReader(new InputStreamReader(System.in));
+    private static final Reader READER = new InputStreamReader(System.in);
 
     private Game game;
 
@@ -30,12 +29,12 @@ public class ConsolePlayer extends PlayerAdapter {
             if (READER.ready()) {
                 c = READER.read();
                 if (c == '\r' || c == '\n') {
-                    if (sb.length() == 0)
-                        continue;
-                    return sb.toString();
+                    if (sb.length() != 0)
+                        return sb.toString();
                 } else {
                     sb.append((char) c);
                 }
+                continue;
             }
             try {
                 Thread.sleep(10);
@@ -92,11 +91,10 @@ public class ConsolePlayer extends PlayerAdapter {
             case MOVES:
                 System.out.println("Choose a move of the opponent from below:");
                 Board.Grid[] moves = choiceSet.moves();
-                StringJoiner sj = new StringJoiner(" ");
                 for (int i = 0; i < moves.length; i++) {
-                    sj.add(String.format("[%d] %s", i + 1, moves[i].pointString()));
+                    System.out.print(String.format("[%d] %s ", i + 1, moves[i].pointString()));
                 }
-                System.out.println(sj);
+                System.out.println();
                 break;
             case MOVE_COUNT:
                 System.out.println("Declare the count of the fifth moves.");

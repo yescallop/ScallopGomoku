@@ -15,9 +15,9 @@ public class Main {
         Game game = Game.newBuilder()
                 .rule(StandardRules.STANDARD_RENJU)
                 .strict(true)
-                .addPlayer(Side.FIRST, new ConsolePlayer("Player 1"))
-                .addPlayer(Side.SECOND, new ConsolePlayer("Player 2"))
-                .addListener(new ConsoleGameListener())
+                .player(Side.FIRST, new ConsolePlayer("Player 1"))
+                .player(Side.SECOND, new ConsolePlayer("Player 2"))
+                .listener(new ConsoleGameListener())
                 .build();
         game.start();
     }

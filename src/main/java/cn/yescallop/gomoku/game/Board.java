@@ -41,14 +41,14 @@ public class Board {
         }
 
         // Fills the adjacent grids
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-                for (Direction d : Direction.values()) {
-                    int[] delta = d.delta();
+        for (Direction d : Direction.values()) {
+            int[] delta = d.delta();
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++) {
                     int adjX = x + delta[0];
                     int adjY = y + delta[1];
                     if (adjX >= 0 && adjX < size && adjY >= 0 && adjY < size)
-                        matrix[y][x].adjacentGrids[d.index()] = matrix[adjY][adjX];
+                        matrix[y][x].adjacentGrids[d.ordinal()] = matrix[adjY][adjX];
                 }
             }
         }

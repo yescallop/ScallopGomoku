@@ -25,7 +25,6 @@ public interface GameListener {
 
     /**
      * Called when multiple moves are requested.
-     * TODO: Implements multiple moves
      *
      * @param side the side requested to move.
      */

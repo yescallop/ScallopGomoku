@@ -5,19 +5,9 @@ package cn.yescallop.gomoku.game;
  */
 public enum Side {
 
-    FIRST(0), SECOND(1);
-
-    private final int index;
-
-    Side(int index) {
-        this.index = index;
-    }
+    FIRST, SECOND;
 
     public Side opposite() {
         return this == FIRST ? SECOND : FIRST;
-    }
-
-    public int index() {
-        return index;
     }
 }

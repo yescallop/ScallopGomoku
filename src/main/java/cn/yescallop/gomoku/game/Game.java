@@ -94,14 +94,14 @@ public interface Game {
      *
      * @return the game timeout in milliseconds.
      */
-    OptionalLong gameTimeout();
+    OptionalLong gameTimeoutMillis();
 
     /**
      * Gets the move timeout.
      *
      * @return the move timeout in milliseconds.
      */
-    OptionalLong moveTimeout();
+    OptionalLong moveTimeoutMillis();
 
     /**
      * Gets the remaining time of a side.
@@ -109,7 +109,7 @@ public interface Game {
      * @param side the side.
      * @return the remaining time in milliseconds.
      */
-    OptionalLong gameTimeRemaining(Side side);
+    OptionalLong gameTimeRemainingMillis(Side side);
 
     /**
      * Gets whether this game is strict.
@@ -179,16 +179,16 @@ public interface Game {
          * @param listener the listener to be added.
          * @return this builder.
          */
-        Builder addListener(GameListener listener);
+        Builder listener(GameListener listener);
 
         /**
-         * Adds a player.
+         * Sets the player by the side.
          *
          * @param side   the side.
          * @param player the player.
          * @return this builder.
          */
-        Builder addPlayer(Side side, Player player);
+        Builder player(Side side, Player player);
 
         /**
          * Sets the game timeout.

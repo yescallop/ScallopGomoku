@@ -21,9 +21,9 @@ public class ConsoleGameListener extends GameListenerAdapter {
     @Override
     public void gameStarted(Game game) {
         this.game = game;
-        LOGGER.info("----- GAME SETTINGS ----");
-        LOGGER.info("Game timeout: " + timeoutString(game.gameTimeout()));
-        LOGGER.info("Move timeout: " + timeoutString(game.moveTimeout()));
+        LOGGER.info("----- GAME SETTINGS -----");
+        LOGGER.info("Game timeout: " + timeoutString(game.gameTimeoutMillis()));
+        LOGGER.info("Move timeout: " + timeoutString(game.moveTimeoutMillis()));
         LOGGER.info("Strict mode: " + (game.isStrict() ? "Enabled" : "Disabled"));
         LOGGER.info("Rule: " + game.rule().name());
         LOGGER.info("----- GAME STARTED -----");
@@ -45,7 +45,7 @@ public class ConsoleGameListener extends GameListenerAdapter {
     public void gameEnded(Result result) {
         Side side = result.winningSide();
 
-        LOGGER.info("------ GAME ENDED ------");
+        LOGGER.info("----- GAME ENDED -----");
         if (side != null)
             LOGGER.info("The winner: {} ({})", game.stoneTypeBySide(side), game.playerNameBySide(side));
         else LOGGER.info("The game ended in a draw.");
@@ -64,7 +64,7 @@ public class ConsoleGameListener extends GameListenerAdapter {
                 LOGGER.warn("Invalid choice by {} ({})", stone, name);
             } else if (t instanceof ExecutionException) {
                 t = t.getCause();
-                LOGGER.warn(t.getClass().getSimpleName() + " occurred by {} ({}): {}", stone, name, t.getMessage());
+                LOGGER.warn("{} occurred by {} ({}): {}", t.getClass().getSimpleName(), stone, name, t.getMessage());
             }
         } else {
             LOGGER.error("Fatal error: ", t);

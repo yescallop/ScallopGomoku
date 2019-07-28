@@ -23,7 +23,7 @@ public interface Judge {
     /**
      * Processes a move made by the player.
      *
-     * @param index the move index
+     * @param index the move index.
      * @param grid  the grid where the move is made.
      * @param side  the side of the move.
      * @throws IllegalMoveException if the move is illegal.

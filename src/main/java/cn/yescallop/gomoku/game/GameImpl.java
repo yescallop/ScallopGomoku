@@ -4,7 +4,6 @@ import cn.yescallop.gomoku.player.Player;
 import cn.yescallop.gomoku.rule.Judge;
 import cn.yescallop.gomoku.rule.Rule;
 import cn.yescallop.gomoku.rule.RuleHelper;
-import cn.yescallop.gomoku.rule.StoneShape;
 
 import java.util.List;
 import java.util.OptionalLong;
@@ -133,19 +132,19 @@ class GameImpl implements Game {
     }
 
     @Override
-    public OptionalLong gameTimeout() {
+    public OptionalLong gameTimeoutMillis() {
         return gameTimeout == 0 ? OptionalLong.empty() : OptionalLong.of(gameTimeout);
     }
 
     @Override
-    public OptionalLong moveTimeout() {
+    public OptionalLong moveTimeoutMillis() {
         return moveTimeout == 0 ? OptionalLong.empty() : OptionalLong.of(moveTimeout);
     }
 
     @Override
-    public OptionalLong gameTimeRemaining(Side side) {
+    public OptionalLong gameTimeRemainingMillis(Side side) {
         return gameThread.gameTimeRemaining == null ?
-                OptionalLong.empty() : OptionalLong.of(gameThread.gameTimeRemaining[side.index()]);
+                OptionalLong.empty() : OptionalLong.of(gameThread.gameTimeRemaining[side.ordinal()]);
     }
 
     @Override
@@ -191,7 +190,7 @@ class GameImpl implements Game {
     // Package-private methods
 
     Player player(Side side) {
-        return players[side.index()];
+        return players[side.ordinal()];
     }
 
     ChoiceSet choiceSet() {

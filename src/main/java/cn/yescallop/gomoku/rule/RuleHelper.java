@@ -1,9 +1,6 @@
 package cn.yescallop.gomoku.rule;
 
-import cn.yescallop.gomoku.game.Board;
-import cn.yescallop.gomoku.game.Direction;
-import cn.yescallop.gomoku.game.IllegalMoveException;
-import cn.yescallop.gomoku.game.StoneType;
+import cn.yescallop.gomoku.game.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,8 +12,7 @@ import java.util.StringJoiner;
 public final class RuleHelper {
 
     /**
-     * The maximum check depth of the interrelationship
-     * of the forbidden moves.
+     * The maximum check depth of the forbidden moves.
      */
     private static final int FORBIDDEN_MOVE_MAX_CHECK_DEPTH = 5;
 
@@ -85,26 +81,26 @@ public final class RuleHelper {
     public static String describeForbiddenMove(List<StoneShape> shapes) {
         if (shapes.contains(StoneShape.FIVE))
             return null;
-        int activeThrees = 0;
+        int openThrees = 0;
         int fours = 0;
         for (StoneShape s : shapes) {
             switch (s) {
                 case OVERLINE:
                     return "Overline";
-                case ACTIVE_THREE:
-                    activeThrees++;
+                case OPEN_THREE:
+                    openThrees++;
                     break;
                 case FOUR:
                     fours++;
                     break;
             }
         }
-        if (activeThrees >= 2 || fours >= 2) {
+        if (openThrees >= 2 || fours >= 2) {
             StringJoiner sj = new StringJoiner("-");
             for (int i = 0; i < fours; i++) {
                 sj.add("4");
             }
-            for (int i = 0; i < activeThrees; i++) {
+            for (int i = 0; i < openThrees; i++) {
                 sj.add("3");
             }
             return sj + " Forbidden Move";
@@ -122,21 +118,21 @@ public final class RuleHelper {
     public static boolean checkForbiddenMove(List<StoneShape> shapes) {
         if (shapes.contains(StoneShape.FIVE))
             return false;
-        int activeThrees = 0;
+        int openThrees = 0;
         int fours = 0;
         for (StoneShape s : shapes) {
             switch (s) {
                 case OVERLINE:
                     return true;
-                case ACTIVE_THREE:
-                    activeThrees++;
+                case OPEN_THREE:
+                    openThrees++;
                     break;
                 case FOUR:
                     fours++;
                     break;
             }
         }
-        return activeThrees >= 2 || fours >= 2;
+        return openThrees >= 2 || fours >= 2;
     }
 
     /**
@@ -179,7 +175,7 @@ public final class RuleHelper {
     private static void lsp(Board.Grid grid, GridNode checked, int d, List<StoneShape> res) {
         int[][] dsp = new int[2][2]; // dsp results
         int[] ds = new int[]{d, Direction.reverse(d)}; // directions
-        boolean[] active = {dsp(grid, checked, ds[0], dsp[0]), dsp(grid, checked, ds[1], dsp[1])};
+        boolean[] open = {dsp(grid, checked, ds[0], dsp[0]), dsp(grid, checked, ds[1], dsp[1])};
         int row = dsp[0][0] + dsp[1][0] + 1; // row size
         if (row == 5) {
             res.add(StoneShape.FIVE);
@@ -189,15 +185,15 @@ public final class RuleHelper {
             res.add(StoneShape.OVERLINE);
             return;
         }
-        if (!active[0] && !active[1]) return;
+        if (!open[0] && !open[1]) return;
 
         for (int i = 0; i < 2; i++) {
             int[] fwdDsp = dsp[i];
             int[] oppDsp = dsp[i ^ 1];
             int total = row + fwdDsp[1];
             if (total == 3) {
-                // total = 3, active ahead and no row behind => Active Three
-                if (active[i] && oppDsp[1] == 0) {
+                // total = 3, open ahead and no row behind => Open Three
+                if (open[i] && oppDsp[1] == 0) {
                     // Check forbidden move
                     Board.Grid aheadFirst = grid.adjacent(ds[i], fwdDsp[0] + 1);
                     Board.Grid aheadSecond = aheadFirst.adjacent(ds[i], fwdDsp[1] + 1);
@@ -208,7 +204,7 @@ public final class RuleHelper {
                         return;
                     }
 
-                    res.add(StoneShape.ACTIVE_THREE);
+                    res.add(StoneShape.OPEN_THREE);
                     return;
                 }
             } else if (total == 4) {
@@ -224,10 +220,12 @@ public final class RuleHelper {
      *
      * @param grid    the grid.
      * @param checked the last node of checked grids.
-     * @return whether there's a forbidden move,
+     * @return whether there's a forbidden move.
      */
     private static boolean cfm(Board.Grid grid, GridNode checked) {
-        if (checked != null && (checked.index >= FORBIDDEN_MOVE_MAX_CHECK_DEPTH || checked.search(grid)))
+        if (FORBIDDEN_MOVE_MAX_CHECK_DEPTH == 1)
+            return false;
+        if (checked != null && (checked.index + 3 > FORBIDDEN_MOVE_MAX_CHECK_DEPTH || checked.search(grid)))
             return false;
 
         return checkForbiddenMove(searchShapes(grid, checked));
@@ -247,7 +245,7 @@ public final class RuleHelper {
      *                the first row, and the second element
      *                is the size of the second row (or -1 if no
      *                empty grid is reached).
-     * @return true if the shape is active in the direction,
+     * @return true if the shape is open in the direction,
      * or else false.
      */
     private static boolean dsp(Board.Grid grid, GridNode checked, int d, int[] res) {
@@ -302,15 +300,14 @@ public final class RuleHelper {
         GridNode(Board.Grid value, GridNode prev) {
             this.value = value;
             this.prev = prev;
-            this.index = prev == null ? 1 : prev.index + 1;
+            this.index = prev == null ? 0 : prev.index + 1;
         }
 
         boolean search(Board.Grid grid) {
-            GridNode cur = this;
-            while (cur != null) {
-                if (cur.value == grid)
+            for (GridNode cur = this; cur != null; cur = cur.prev) {
+                if (cur.value == grid) {
                     return true;
-                cur = cur.prev;
+                }
             }
             return false;
         }
