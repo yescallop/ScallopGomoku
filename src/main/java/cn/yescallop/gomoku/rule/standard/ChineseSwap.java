@@ -24,6 +24,5 @@ public class ChineseSwap extends StandardGomoku {
     @Override
     public void processChoice(int index, int choice, Side side) {
         if (choice == 0) controller.swap();
-        controller.setSideByStoneType(StoneType.WHITE);
     }
 }

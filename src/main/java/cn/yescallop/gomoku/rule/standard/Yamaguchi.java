@@ -26,7 +26,7 @@ public class Yamaguchi extends StandardRenju {
         } else if (index == 3) {
             controller.requestChoice(ChoiceSet.ofMaxMoveCount(game.board()), side);
         } else {
-            controller.requestMultipleMoves(moveCount, game.sideByStoneType(StoneType.BLACK));
+            controller.requestMultipleMoves(moveCount);
         }
     }
 
@@ -37,9 +37,8 @@ public class Yamaguchi extends StandardRenju {
             controller.requestChoice(
                     ChoiceSet.ofStrings("Choose Black", "Choose White"),
                     Side.SECOND);
-        } else {
-            if (choice == 0) controller.swap();
-            controller.setSideByStoneType(StoneType.WHITE);
+        } else if (choice == 0) {
+            controller.swap();
         }
     }
 }

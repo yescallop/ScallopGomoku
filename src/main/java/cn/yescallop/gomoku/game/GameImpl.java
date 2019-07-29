@@ -35,9 +35,10 @@ class GameImpl implements Game {
     private boolean ended;
     private boolean swapped = false;
 
+    private Side sideAwaitingChoice = null;
     private ChoiceSet choiceSet = null;
 
-    private Side currentSide = Side.FIRST;
+    private StoneType currentStoneType = StoneType.BLACK;
 
     private Result result = null;
 
@@ -80,12 +81,12 @@ class GameImpl implements Game {
 
     @Override
     public Side currentSide() {
-        return currentSide;
+        return sideByStoneType(currentStoneType);
     }
 
     @Override
     public StoneType currentStoneType() {
-        return stoneTypeBySide(currentSide);
+        return currentStoneType;
     }
 
     @Override
@@ -182,15 +183,14 @@ class GameImpl implements Game {
         return swapped;
     }
 
-    @Override
-    public boolean isAwaitingChoice() {
-        return choiceSet != null;
-    }
-
     // Package-private methods
 
     Player player(Side side) {
         return players[side.ordinal()];
+    }
+
+    Side sideAwaitingChoice() {
+        return sideAwaitingChoice;
     }
 
     ChoiceSet choiceSet() {
@@ -198,6 +198,7 @@ class GameImpl implements Game {
     }
 
     void resetChoice() {
+        sideAwaitingChoice = null;
         choiceSet = null;
     }
 
@@ -246,38 +247,24 @@ class GameImpl implements Game {
         }
 
         @Override
-        public void switchSide() {
-            currentSide = currentSide.opposite();
-        }
-
-        @Override
-        public void setSide(Side side) {
-            currentSide = side;
-        }
-
-        @Override
-        public void setSideByStoneType(StoneType stone) {
-            currentSide = sideByStoneType(stone);
-        }
-
-        @Override
         public void makeMove(Board.Grid grid) {
-            board.move(grid, currentStoneType());
-            listenerGroup.moveMade(grid, currentSide);
+            board.move(grid, currentStoneType);
+            listenerGroup.moveMade(grid, currentSide());
+            currentStoneType = currentStoneType.opposite();
         }
 
         @Override
-        public void requestMultipleMoves(int count, Side side) {
+        public void requestMultipleMoves(int count) {
             if (count < 2)
                 throw new IllegalArgumentException("count < 2");
-            currentSide = side;
+
             gameThread.multipleMovesRequested(count);
-            listenerGroup.multipleMovesRequested(count, currentSide);
+            listenerGroup.multipleMovesRequested(count, currentSide());
         }
 
         @Override
         public void requestChoice(ChoiceSet choiceSet, Side side) {
-            currentSide = side;
+            sideAwaitingChoice = side;
             GameImpl.this.choiceSet = choiceSet;
         }
 
@@ -290,8 +277,9 @@ class GameImpl implements Game {
         public void end(Result.Type resultType, Side winningSide, String description) {
             ended = true;
             started = false;
+            currentStoneType = null;
+            sideAwaitingChoice = null;
             choiceSet = null;
-            currentSide = null;
             result = new Result(resultType, winningSide, description);
             listenerGroup.gameEnded(result);
         }

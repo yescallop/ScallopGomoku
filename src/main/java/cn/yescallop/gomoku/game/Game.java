@@ -156,11 +156,6 @@ public interface Game {
     boolean isSwapped();
 
     /**
-     * Tells whether a choice is being awaited.
-     */
-    boolean isAwaitingChoice();
-
-    /**
      * A builder of Game.
      */
     interface Builder {
@@ -269,25 +264,6 @@ public interface Game {
         void swap();
 
         /**
-         * Switches the turn to move.
-         */
-        void switchSide();
-
-        /**
-         * Sets the current side.
-         *
-         * @param side the side.
-         */
-        void setSide(Side side);
-
-        /**
-         * Sets the current side by the stone type.
-         *
-         * @param stone the stone type.
-         */
-        void setSideByStoneType(StoneType stone);
-
-        /**
          * Makes a move.
          *
          * @param grid the grid where the move is made.
@@ -298,9 +274,8 @@ public interface Game {
          * Requests multiple moves.
          *
          * @param count the count of moves requested.
-         * @param side  the side requested to move.
          */
-        void requestMultipleMoves(int count, Side side);
+        void requestMultipleMoves(int count);
 
         /**
          * Requests a choice.

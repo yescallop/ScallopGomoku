@@ -49,7 +49,6 @@ public class Tarannikov extends StandardRenju {
     public void processChoice(int index, int choice, Side side) {
         if ((choice == 0) ^ (game.stoneTypeBySide(side) == StoneType.BLACK)) {
             controller.swap();
-            controller.switchSide();
         }
     }
 }

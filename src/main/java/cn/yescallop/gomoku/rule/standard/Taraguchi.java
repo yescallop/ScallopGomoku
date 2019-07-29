@@ -28,7 +28,7 @@ public class Taraguchi extends Tarannikov {
                 throw new IllegalMoveException("The fourth move outside central 7x7 area");
             controller.makeMove(grid);
             controller.requestChoice(
-                    ChoiceSet.ofStrings("Choose Black", "Choose White", "Offer Moves"),
+                    ChoiceSet.ofStrings("Choose Black", "Choose White", "Offer " + n + " Moves"),
                     side.opposite()
             );
         } else super.processMove(index, grid, side);
@@ -37,7 +37,7 @@ public class Taraguchi extends Tarannikov {
     @Override
     public void processChoice(int index, int choice, Side side) {
         if (index == 4 && choice == 2) {
-            controller.requestMultipleMoves(n, side);
+            controller.requestMultipleMoves(n);
         } else super.processChoice(index, choice, side);
     }
 }

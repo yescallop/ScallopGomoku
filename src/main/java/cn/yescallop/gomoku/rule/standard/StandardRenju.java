@@ -19,7 +19,6 @@ public class StandardRenju extends AbstractJudge {
         if (grid.stone() == StoneType.WHITE) {
             if (RuleHelper.longestRowSize(grid) >= 5) {
                 controller.end(Result.Type.ROW_COMPLETED, side);
-                return;
             }
         } else if (game.isStrict()) {
             List<StoneShape> shapes = RuleHelper.searchShapes(grid);
@@ -30,15 +29,10 @@ public class StandardRenju extends AbstractJudge {
             String description = RuleHelper.describeForbiddenMove(shapes);
             if (description != null) {
                 controller.end(Result.Type.FORBIDDEN_MOVE_MADE, side.opposite(), description);
-                return;
             }
-        } else {
-            if (RuleHelper.longestRowSize(grid) == 5) {
-                controller.end(Result.Type.ROW_COMPLETED, side);
-                return;
-            }
+        } else if (RuleHelper.longestRowSize(grid) == 5) {
+            controller.end(Result.Type.ROW_COMPLETED, side);
         }
-        controller.switchSide();
     }
 
     @Override

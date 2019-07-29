@@ -33,7 +33,6 @@ public class Swap2 extends StandardGomoku {
     public void processChoice(int index, int choice, Side side) {
         if (choice == 0) controller.swap();
         if (choice != 2) {
-            controller.setSideByStoneType(StoneType.WHITE);
             choiceMade = true;
         }
     }

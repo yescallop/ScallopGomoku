@@ -18,14 +18,16 @@ public class GomokuPro extends StandardGomoku {
             super.processMove(index, grid, side);
             return;
         }
-        if (index == 1 &&
-                RuleHelper.chebyshevDistToCenter(grid) != 0) {
-            throw new IllegalMoveException("The first move not in the center");
-        } else if (index == 3 &&
-                RuleHelper.chebyshevDistToCenter(grid) < 3) {
-            throw new IllegalMoveException("The third move inside central 5x5 area");
+        switch (index) {
+            case 1:
+                if (RuleHelper.chebyshevDistToCenter(grid) != 0)
+                    throw new IllegalMoveException("The first move not in the center");
+                break;
+            case 3:
+                if (RuleHelper.chebyshevDistToCenter(grid) < 3)
+                    throw new IllegalMoveException("The third move inside central 5x5 area");
+                break;
         }
         controller.makeMove(grid);
-        controller.switchSide();
     }
 }

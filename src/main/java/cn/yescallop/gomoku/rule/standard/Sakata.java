@@ -34,14 +34,11 @@ public class Sakata extends StandardRenju {
         controller.makeMove(grid);
         if (index != 3) {
             controller.swap();
-        } else {
-            controller.switchSide();
         }
     }
 
     @Override
     public void processChoice(int index, int choice, Side side) {
         if (choice == 0) controller.swap();
-        controller.setSideByStoneType(StoneType.WHITE);
     }
 }

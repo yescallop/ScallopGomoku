@@ -50,14 +50,8 @@ public class Soosyrv extends StandardRenju {
         }
         if ((choice == 0) ^ (game.stoneTypeBySide(side) == StoneType.BLACK))
             controller.swap();
-        if (index == 3) {
-            if (moveCount != 1) {
-                controller.requestMultipleMoves(moveCount, game.sideByStoneType(StoneType.BLACK));
-            } else {
-                controller.setSideByStoneType(StoneType.BLACK);
-            }
-        } else { // index = 1
-            controller.setSideByStoneType(StoneType.WHITE);
+        if (index == 3 && moveCount != 1) {
+            controller.requestMultipleMoves(moveCount);
         }
     }
 }

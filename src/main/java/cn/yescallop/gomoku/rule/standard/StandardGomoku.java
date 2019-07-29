@@ -22,9 +22,7 @@ public class StandardGomoku extends AbstractJudge {
         controller.makeMove(grid);
         if (RuleHelper.longestRowSize(grid) == 5) {
             controller.end(Result.Type.ROW_COMPLETED, side);
-            return;
         }
-        controller.switchSide();
     }
 
     @Override

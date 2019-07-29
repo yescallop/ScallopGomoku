@@ -26,13 +26,12 @@ public class RIF extends StandardRenju {
                     ChoiceSet.ofStrings("Choose Black", "Choose White"),
                     Side.SECOND);
         } else {
-            controller.requestMultipleMoves(2, game.sideByStoneType(StoneType.BLACK));
+            controller.requestMultipleMoves(2);
         }
     }
 
     @Override
     public void processChoice(int index, int choice, Side side) {
         if (choice == 0) controller.swap();
-        controller.setSideByStoneType(StoneType.WHITE);
     }
 }

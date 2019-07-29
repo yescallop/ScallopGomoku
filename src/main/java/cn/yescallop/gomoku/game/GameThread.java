@@ -34,13 +34,13 @@ class GameThread extends Thread {
     @Override
     public void run() {
         while (!game.isEnded()) {
-            Side side = game.currentSide();
+            Side side = null;
             long startTime = System.currentTimeMillis();
             try {
-                if (game.isAwaitingChoice()) {
+                if ((side = game.sideAwaitingChoice()) != null) {
                     requestChoice(game.choiceSet(), side);
                 } else {
-                    requestMove(side);
+                    requestMove(side = game.currentSide());
                 }
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 if (gameTimeRemaining != null)
@@ -123,9 +123,7 @@ class GameThread extends Thread {
         game.listenerGroup.choiceMade(choiceSet, choice, side);
         if (choiceSet.type() == ChoiceSet.Type.MOVES) {
             Board.Grid move = choiceSet.moves()[choice];
-            game.controller.switchSide();
             game.controller.makeMove(move);
-            game.controller.switchSide();
         } else game.judge.processChoice(++choiceIndex, choice, side);
     }
 
