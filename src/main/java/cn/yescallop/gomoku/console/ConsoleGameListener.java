@@ -42,9 +42,15 @@ public class ConsoleGameListener extends GameListenerAdapter {
     }
 
     @Override
+    public void moveRequested(Side side) {
+        printBoard();
+    }
+
+    @Override
     public void gameEnded(Result result) {
         Side side = result.winningSide();
 
+        printBoard();
         LOGGER.info("----- GAME ENDED -----");
         if (side != null)
             LOGGER.info("The winner: {} ({})", game.stoneTypeBySide(side), game.playerNameBySide(side));
@@ -69,6 +75,26 @@ public class ConsoleGameListener extends GameListenerAdapter {
         } else {
             LOGGER.error("Fatal error: ", t);
         }
+    }
+
+    private void printBoard() {
+        Board board = game.board();
+        int size = board.size();
+        for (int y = size - 1; y >= 0; y--) {
+            if (y < 9) System.out.print(' ');
+            System.out.print(y + 1);
+            for (int x = 0; x < size; x++) {
+                StoneType stone = board.getGrid(x, y).stone();
+                System.out.print(stone == null ? "  -" : (stone == StoneType.BLACK ? "  X" : "  0"));
+            }
+            System.out.println();
+        }
+        System.out.print("  ");
+        for (int i = 0; i < size; i++) {
+            System.out.print("  ");
+            System.out.print((char) ('A' + i));
+        }
+        System.out.println();
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
