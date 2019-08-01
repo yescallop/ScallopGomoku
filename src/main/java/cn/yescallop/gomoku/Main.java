@@ -13,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
         Game game = Game.newBuilder()
-                .rule(StandardRules.STANDARD_RENJU)
+                .rule(StandardRules.STANDARD_GOMOKU)
                 .strict(true)
                 .player(Side.FIRST, new ConsolePlayer("Player 1"))
                 .player(Side.SECOND, new ConsolePlayer("Player 2"))

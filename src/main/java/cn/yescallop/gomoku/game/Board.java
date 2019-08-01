@@ -1,5 +1,7 @@
 package cn.yescallop.gomoku.game;
 
+import java.io.PrintStream;
+
 /**
  * A Board consists of the Grid matrix.
  *
@@ -85,6 +87,29 @@ public class Board {
 
     public Grid getGrid(Point p) {
         return matrix[p.y][p.x];
+    }
+
+    /**
+     * Prints the board to a PrintStream.
+     *
+     * @param out the output PrintStream.
+     */
+    public void printTo(PrintStream out) {
+        for (int y = size - 1; y >= 0; y--) {
+            if (y < 9) out.print(' ');
+            out.print(y + 1);
+            for (int x = 0; x < size; x++) {
+                StoneType stone = matrix[y][x].stone;
+                out.print(stone == null ? "  -" : (stone == StoneType.BLACK ? "  X" : "  0"));
+            }
+            out.println();
+        }
+        out.print("  ");
+        for (int i = 0; i < size; i++) {
+            out.print("  ");
+            out.print((char) ('A' + i));
+        }
+        out.println();
     }
 
     /**

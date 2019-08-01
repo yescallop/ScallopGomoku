@@ -18,7 +18,7 @@ public class FreestyleGomoku extends AbstractJudge {
     @Override
     public void processMove(int index, Board.Grid grid, Side side) {
         controller.makeMove(grid);
-        if (RuleHelper.longestRowSize(grid) >= 5) {
+        if (RuleHelper.longestRowLen(grid) >= 5) {
             controller.end(Result.Type.ROW_COMPLETED, side);
         }
     }

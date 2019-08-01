@@ -17,7 +17,7 @@ public class StandardRenju extends AbstractJudge {
     public void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException {
         controller.makeMove(grid);
         if (grid.stone() == StoneType.WHITE) {
-            if (RuleHelper.longestRowSize(grid) >= 5) {
+            if (RuleHelper.longestRowLen(grid) >= 5) {
                 controller.end(Result.Type.ROW_COMPLETED, side);
             }
         } else if (game.isStrict()) {
@@ -30,7 +30,7 @@ public class StandardRenju extends AbstractJudge {
             if (description != null) {
                 controller.end(Result.Type.FORBIDDEN_MOVE_MADE, side.opposite(), description);
             }
-        } else if (RuleHelper.longestRowSize(grid) == 5) {
+        } else if (RuleHelper.longestRowLen(grid) == 5) {
             controller.end(Result.Type.ROW_COMPLETED, side);
         }
     }

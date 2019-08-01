@@ -58,6 +58,7 @@ public class ConsolePlayer extends PlayerAdapter {
 
     @Override
     public Board.Point requestMove(long timeoutMillis) throws Exception {
+        game.board().printTo(System.out);
         System.out.printf("[%s] [%s] Please enter your move: ", name, game.stoneTypeBySide(side));
         try {
             return Board.Point.parse(readLine());

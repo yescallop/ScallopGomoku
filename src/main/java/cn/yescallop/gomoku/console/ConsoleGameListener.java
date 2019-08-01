@@ -1,11 +1,13 @@
 package cn.yescallop.gomoku.console;
 
+import cn.yescallop.gomoku.ai.GomokuUtil;
 import cn.yescallop.gomoku.event.GameListenerAdapter;
 import cn.yescallop.gomoku.game.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.OptionalLong;
 import java.util.concurrent.ExecutionException;
 
@@ -38,19 +40,17 @@ public class ConsoleGameListener extends GameListenerAdapter {
     public void moveMade(Board.Grid move, Side side) {
         String name = game.playerNameBySide(side);
         StoneType stone = game.stoneTypeBySide(side);
-        LOGGER.info("{} ({}) made a move: {}", stone, name, move.pointString());
-    }
-
-    @Override
-    public void moveRequested(Side side) {
-        printBoard();
+        LOGGER.info("{} ({}) moved: {}", stone, name, move.pointString());
+        StoneShape[] shapes = GomokuUtil.searchShapes(move, stone, true)
+                .toArray(StoneShape[]::new);
+        System.out.println(Arrays.toString(shapes));
     }
 
     @Override
     public void gameEnded(Result result) {
         Side side = result.winningSide();
 
-        printBoard();
+        game.board().printTo(System.out);
         LOGGER.info("----- GAME ENDED -----");
         if (side != null)
             LOGGER.info("The winner: {} ({})", game.stoneTypeBySide(side), game.playerNameBySide(side));
@@ -75,26 +75,6 @@ public class ConsoleGameListener extends GameListenerAdapter {
         } else {
             LOGGER.error("Fatal error: ", t);
         }
-    }
-
-    private void printBoard() {
-        Board board = game.board();
-        int size = board.size();
-        for (int y = size - 1; y >= 0; y--) {
-            if (y < 9) System.out.print(' ');
-            System.out.print(y + 1);
-            for (int x = 0; x < size; x++) {
-                StoneType stone = board.getGrid(x, y).stone();
-                System.out.print(stone == null ? "  -" : (stone == StoneType.BLACK ? "  X" : "  0"));
-            }
-            System.out.println();
-        }
-        System.out.print("  ");
-        for (int i = 0; i < size; i++) {
-            System.out.print("  ");
-            System.out.print((char) ('A' + i));
-        }
-        System.out.println();
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

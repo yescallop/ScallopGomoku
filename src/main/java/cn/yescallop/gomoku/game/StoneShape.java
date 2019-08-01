@@ -16,4 +16,16 @@ public enum StoneShape {
     TWO,
     OPEN_TWO,
     SEMI_OPEN_TWO;
+
+    public static StoneShape ofLength(int len, boolean open) {
+        switch (len) {
+            case 2:
+                return open ? OPEN_TWO : SEMI_OPEN_TWO;
+            case 3:
+                return open ? OPEN_THREE : SEMI_OPEN_THREE;
+            case 4:
+                return open ? OPEN_FOUR : SEMI_OPEN_FOUR;
+        }
+        return null;
+    }
 }

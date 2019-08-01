@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringJoiner;
 
+import static cn.yescallop.gomoku.game.StoneShape.*;
+
 /**
  * @author Scallop Ye
  */
@@ -21,36 +23,46 @@ public final class RuleHelper {
     }
 
     /**
-     * Calculates the size of the longest row
+     * Calculates the length of the longest row
      * containing the specified grid.
      *
      * @param grid the grid.
-     * @return the size.
+     * @return the length.
      */
-    public static int longestRowSize(Board.Grid grid) {
+    public static int longestRowLen(Board.Grid grid) {
         if (grid.isEmpty())
             throw new IllegalArgumentException("Empty grid");
         int res = 0;
         for (int d = 0; d < 4; d++) {
-            int cs = dcs(grid, d) + dcs(grid, Direction.reverse(d)) + 1;
+            int cs = rowLen(grid, d);
             if (cs > res) res = cs;
         }
         return res;
     }
 
     /**
-     * Calculates the size of the row in the direction.
+     * Calculates the length of the row in the line.
      *
-     * @param grid the grid, exclusive.
+     * @param grid the grid.
      * @param d    the direction index.
-     * @return the size.
+     * @return the length.
      */
-    private static int dcs(Board.Grid grid, int d) {
+    private static int rowLen(Board.Grid grid, int d) {
         StoneType stone = grid.stone();
-        int res = 0;
+        int res = 1;
+        Board.Grid gFwd = grid;
+        Board.Grid gBwd = grid;
+        int dr = Direction.reverse(d);
+
         while (true) {
-            grid = grid.adjacent(d);
-            if (grid != null && grid.stone() == stone)
+            gFwd = gFwd.adjacent(d);
+            if (gFwd != null && gFwd.stone() == stone)
+                res++;
+            else break;
+        }
+        while (true) {
+            gBwd = gBwd.adjacent(dr);
+            if (gBwd != null && gBwd.stone() == stone)
                 res++;
             else break;
         }
@@ -79,7 +91,7 @@ public final class RuleHelper {
      * there is a forbidden move, or else null.
      */
     public static String describeForbiddenMove(List<StoneShape> shapes) {
-        if (shapes.contains(StoneShape.FIVE))
+        if (shapes.contains(FIVE))
             return null;
         int openThrees = 0;
         int fours = 0;
@@ -116,7 +128,7 @@ public final class RuleHelper {
      * @return whether there's a forbidden move,
      */
     public static boolean checkForbiddenMove(List<StoneShape> shapes) {
-        if (shapes.contains(StoneShape.FIVE))
+        if (shapes.contains(FIVE))
             return false;
         int openThrees = 0;
         int fours = 0;
@@ -165,7 +177,7 @@ public final class RuleHelper {
     }
 
     /**
-     * Searches shapes in the line.
+     * Searches shapes in a line.
      *
      * @param grid    the grid.
      * @param checked the last node of checked grids.
@@ -176,41 +188,46 @@ public final class RuleHelper {
         int[][] dsp = new int[2][2]; // dsp results
         int[] ds = new int[]{d, Direction.reverse(d)}; // directions
         boolean[] open = {dsp(grid, checked, ds[0], dsp[0]), dsp(grid, checked, ds[1], dsp[1])};
-        int row = dsp[0][0] + dsp[1][0] + 1; // row size
+        int row = dsp[0][0] + dsp[1][0] + 1; // row length
         if (row == 5) {
-            res.add(StoneShape.FIVE);
+            res.add(FIVE);
             return;
         }
         if (row > 5) {
-            res.add(StoneShape.OVERLINE);
+            res.add(OVERLINE);
             return;
         }
-        if (!open[0] && !open[1]) return;
 
         for (int i = 0; i < 2; i++) {
             int[] fwdDsp = dsp[i];
-            int[] oppDsp = dsp[i ^ 1];
-            int total = row + fwdDsp[1];
+            int[] bwdDsp = dsp[i ^ 1];
+            int total = row;
+            if (fwdDsp[1] != -1)
+                total += fwdDsp[1];
             if (total == 3) {
-                // total = 3, open ahead and no row behind => Open Three
-                if (open[i] && oppDsp[1] == 0) {
+                // total = 3, open forward and backward
+                // there's an empty grid and no row => Open Three
+                if (open[i] && bwdDsp[1] == 0) {
                     // Check forbidden move
-                    Board.Grid aheadFirst = grid.adjacent(ds[i], fwdDsp[0] + 1);
-                    Board.Grid aheadSecond = aheadFirst.adjacent(ds[i], fwdDsp[1] + 1);
-                    Board.Grid behind = grid.adjacent(ds[i ^ 1], oppDsp[0] + 1);
-                    if (cfm(aheadFirst, checked) ||
-                            cfm(aheadSecond, checked) ||
-                            cfm(behind, checked)) {
+                    Board.Grid fwdFirst = grid.adjacent(ds[i], fwdDsp[0] + 1);
+                    Board.Grid fwdSecond = fwdFirst.adjacent(ds[i], fwdDsp[1] + 1);
+                    Board.Grid bwd = grid.adjacent(ds[i ^ 1], bwdDsp[0] + 1);
+                    if (cfm(fwdFirst, checked) ||
+                            cfm(fwdSecond, checked) ||
+                            cfm(bwd, checked)) {
                         return;
                     }
 
-                    res.add(StoneShape.OPEN_THREE);
+                    res.add(OPEN_THREE);
                     return;
                 }
             } else if (total == 4) {
-                res.add(StoneShape.FOUR);
-                if (row == 4) // Avoid double Fours
+                if (row != 4) {
+                    res.add(FOUR);
+                } else if (fwdDsp[1] == 0 && bwdDsp[1] <= 0) {
+                    res.add(FOUR);
                     return;
+                }
             }
         }
     }
@@ -232,18 +249,18 @@ public final class RuleHelper {
     }
 
     /**
-     * Calculates the size of the row in the direction,
-     * and when it reaches the end, searches ahead for a
-     * second row and also calculates the size.
+     * Calculates the length of the row in the direction,
+     * and when it reaches the end, searches forward for a
+     * second row and also calculates the length.
      * Between the two rows is one empty grid.
      *
      * @param grid    the grid, exclusive.
      * @param checked the last node of checked grids.
      * @param d       the direction index.
      * @param res     an array of length 2 to store the result,
-     *                in which the first element is the size of
+     *                in which the first element is the length of
      *                the first row, and the second element
-     *                is the size of the second row (or -1 if no
+     *                is the length of the second row (or -1 if no
      *                empty grid is reached).
      * @return true if the shape is open in the direction,
      * or else false.
