@@ -57,20 +57,15 @@ public final class GomokuUtil {
             return;
         }
 
-        int i = 0;
-        int j = 2;
-
         if (central == 1) {
             // -(X)-X-X-
             // fwd
             if (crl[1] == (1 << 16 | 1) && crl[2] == (1 << 16 | 1)) {
                 res.add(SEMI_OPEN_THREE);
-                i = 1;
             }
             // bwd
             if (crl[3] == (1 << 16 | 1) && crl[4] == (1 << 16 | 1)) {
                 res.add(SEMI_OPEN_THREE);
-                j = 1;
             }
             // -X-(X)-X-
             boolean flag = true;
@@ -82,28 +77,19 @@ public final class GomokuUtil {
             }
             if (flag)
                 res.add(SEMI_OPEN_THREE);
-            if (i == j)
-                return;
         }
 
-        boolean b = i == 0;
-        int _fwd = crl[b ? 1 : 3];
-        int[] fwd = new int[]{_fwd & 0xffff, _fwd >> 16};
+        int[] fwd = new int[]{crl[1] & 0xffff, crl[1] >> 16};
+        int[] bwd = new int[]{crl[3] & 0xffff, crl[3] >> 16};
 
-        int _bwd = crl[b ? 3 : 1];
-        int[] bwd = new int[]{_bwd & 0xffff, _bwd >> 16};
-
-        int _fwdEmpty = crl[b ? 2 : 4];
-        int[] fwdEmpty = new int[]{_fwdEmpty & 0xffff, _fwdEmpty >> 16};
-
-        int _bwdEmpty = crl[b ? 4 : 2];
-        int[] bwdEmpty = new int[]{_bwdEmpty & 0xffff, _bwdEmpty >> 16};
+        int[] fwdEmpty = new int[]{crl[2] & 0xffff, crl[2] >> 16};
+        int[] bwdEmpty = new int[]{crl[4] & 0xffff, crl[4] >> 16};
 
         int maxEmpty = maxEmpty(central);
         boolean flag = false;
 
-        for (; i < j; i++) {
-            if (b && i == 1) {
+        for (int i = 0; i < 2; i++) {
+            if (i == 1) {
                 int[] tmp = fwd;
                 fwd = bwd;
                 bwd = tmp;
@@ -113,13 +99,13 @@ public final class GomokuUtil {
             }
             int total = central;
             int open;
-            if (fwdEmpty[0] <= maxEmpty && fwd[0] != 0) {
+            if (fwd[0] != 0 && fwdEmpty[0] <= maxEmpty) {
                 total += fwd[0];
                 open = checkOpen(total, fwdEmpty[0], fwdEmpty[1], bwdEmpty[0], fwd[1], bwd[0]);
                 if (open != -1)
                     res.add(StoneShape.ofLength(total, open == 1));
             } else {
-                if (flag) return;
+                if (flag) return; // two same unbroken rows
                 open = checkOpen(total, 0, fwdEmpty[0], bwdEmpty[0], fwd[0], bwd[0]);
                 if (open != -1)
                     res.add(StoneShape.ofLength(total, open == 1));

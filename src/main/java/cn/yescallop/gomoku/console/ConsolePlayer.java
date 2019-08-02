@@ -5,16 +5,16 @@ import cn.yescallop.gomoku.game.ChoiceSet;
 import cn.yescallop.gomoku.game.Game;
 import cn.yescallop.gomoku.player.PlayerAdapter;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 
 /**
  * @author Scallop Ye
  */
 public class ConsolePlayer extends PlayerAdapter {
 
-    private static final Reader READER = new InputStreamReader(System.in);
+    private static final BufferedReader READER = new BufferedReader(new InputStreamReader(System.in));
 
     private Game game;
 
@@ -23,19 +23,9 @@ public class ConsolePlayer extends PlayerAdapter {
     }
 
     private static String readLine() throws InterruptedException, IOException {
-        StringBuilder sb = new StringBuilder();
-        int c;
-        while (true) {
-            if (READER.ready()) {
-                c = READER.read();
-                if (c == '\r' || c == '\n') {
-                    if (sb.length() != 0)
-                        return sb.toString();
-                } else {
-                    sb.append((char) c);
-                }
-                continue;
-            }
+        while (true) { //TODO: Figure out why characters cannot be seen as soon as they are typed in CMD or PowerShell.
+            if (READER.ready())
+                return READER.readLine();
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
