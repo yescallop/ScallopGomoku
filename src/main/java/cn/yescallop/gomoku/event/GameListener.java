@@ -51,7 +51,7 @@ public interface GameListener {
      * Called when a choice is requested.
      *
      * @param choiceSet the choice set.
-     * @param side      the side.
+     * @param side the side.
      */
     void choiceRequested(ChoiceSet choiceSet, Side side);
 
@@ -59,8 +59,8 @@ public interface GameListener {
      * Called when a choice is made.
      *
      * @param choiceSet the choice set.
-     * @param choice    the choice.
-     * @param side      the side.
+     * @param choice the choice.
+     * @param side the side.
      */
     void choiceMade(ChoiceSet choiceSet, int choice, Side side);
 
@@ -79,7 +79,7 @@ public interface GameListener {
     /**
      * Called when an exception is caught.
      *
-     * @param t    the exception.
+     * @param t the exception.
      * @param side the side which the exception occurred in.
      */
     void exceptionCaught(Throwable t, Side side);

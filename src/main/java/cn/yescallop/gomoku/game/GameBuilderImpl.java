@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 class GameBuilderImpl implements Game.Builder {
 
     Rule rule;
-    ListenerGroup listenerGroup = new ListenerGroup();
-    Player[] players = new Player[2];
+    final ListenerGroup listenerGroup = new ListenerGroup();
+    final Player[] players = new Player[2];
     long gameTimeout = 0;
     long moveTimeout = 0;
     boolean strict = false;

@@ -8,7 +8,8 @@ import cn.yescallop.gomoku.game.StoneType;
 import java.util.LinkedList;
 import java.util.List;
 
-import static cn.yescallop.gomoku.game.StoneShape.*;
+import static cn.yescallop.gomoku.game.StoneShape.FIVE;
+import static cn.yescallop.gomoku.game.StoneShape.SEMI_OPEN_THREE;
 
 /**
  * @author Scallop Ye
@@ -32,11 +33,11 @@ public final class GomokuUtil {
     /**
      * Searches shapes in the line.
      *
-     * @param grid     the grid.
-     * @param stone    the stone type.
-     * @param d        the direction index.
+     * @param grid the grid.
+     * @param stone the stone type.
+     * @param d the direction index.
      * @param standard whether the rule is Standard Gomoku.
-     * @param res      the list of shapes.
+     * @param res the list of shapes.
      */
     private static void ssl(Board.Grid grid, StoneType stone, int d, boolean standard, List<StoneShape> res) {
         int[] crl = crl(grid, stone, d);

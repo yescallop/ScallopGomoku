@@ -1,6 +1,9 @@
 package cn.yescallop.gomoku.rule.standard;
 
-import cn.yescallop.gomoku.game.*;
+import cn.yescallop.gomoku.game.Board;
+import cn.yescallop.gomoku.game.ChoiceSet;
+import cn.yescallop.gomoku.game.IllegalMoveException;
+import cn.yescallop.gomoku.game.Side;
 
 /**
  * A judge of the rule "Chinese Swap", a.k.a. "一手交换".

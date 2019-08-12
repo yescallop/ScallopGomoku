@@ -15,7 +15,7 @@ public interface Judge {
     /**
      * Called when the game is started.
      *
-     * @param game       the game.
+     * @param game the game.
      * @param controller the game controller.
      */
     void gameStarted(Game game, Game.Controller controller);
@@ -24,8 +24,8 @@ public interface Judge {
      * Processes a move made by the player.
      *
      * @param index the move index.
-     * @param grid  the grid where the move is made.
-     * @param side  the side of the move.
+     * @param grid the grid where the move is made.
+     * @param side the side of the move.
      * @throws IllegalMoveException if the move is illegal.
      */
     void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException;
@@ -33,9 +33,9 @@ public interface Judge {
     /**
      * Processes a choice made by the player.
      *
-     * @param index  the choice index.
+     * @param index the choice index.
      * @param choice the choice made by the player.
-     * @param side   the side of the choice.
+     * @param side the side of the choice.
      */
     void processChoice(int index, int choice, Side side);
 

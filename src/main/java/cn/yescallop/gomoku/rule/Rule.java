@@ -12,7 +12,7 @@ public interface Rule {
     /**
      * Creates a Gomoku rule with the specified name and judge supplier.
      *
-     * @param name          the name.
+     * @param name the name.
      * @param judgeSupplier the judge supplier.
      * @return the rule.
      */
@@ -23,7 +23,7 @@ public interface Rule {
     /**
      * Creates a Renju rule with the specified name and judge supplier.
      *
-     * @param name          the name.
+     * @param name the name.
      * @param judgeSupplier the judge supplier.
      * @return the rule.
      */

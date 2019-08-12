@@ -8,6 +8,7 @@ import cn.yescallop.gomoku.game.*;
  * @author Scallop Ye
  */
 public abstract class GameListenerAdapter implements GameListener {
+
     @Override
     public void gameStarted(Game game) {
 

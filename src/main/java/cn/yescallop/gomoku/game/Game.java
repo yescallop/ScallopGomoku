@@ -84,7 +84,7 @@ public interface Game {
      * It is not recommended to report yourself.
      *
      * @param point the point where the move was made,
-     *              or the point where there's an overline.
+     * or the point where there's an overline.
      * @return true if the report succeeded, or else false.
      */
     boolean reportForbiddenMove(Board.Point point);
@@ -179,7 +179,7 @@ public interface Game {
         /**
          * Sets the player by the side.
          *
-         * @param side   the side.
+         * @param side the side.
          * @param player the player.
          * @return this builder.
          */
@@ -189,7 +189,7 @@ public interface Game {
          * Sets the game timeout.
          *
          * @param timeout the game timeout, 0 for no timeout.
-         * @param unit    the time unit of the timeout argument.
+         * @param unit the time unit of the timeout argument.
          * @return this builder.
          */
         Builder gameTimeout(long timeout, TimeUnit unit);
@@ -198,7 +198,7 @@ public interface Game {
          * Sets the move timeout.
          *
          * @param timeout the move timeout, 0 for no timeout.
-         * @param unit    the time unit of the timeout argument.
+         * @param unit the time unit of the timeout argument.
          * @return this builder.
          */
         Builder moveTimeout(long timeout, TimeUnit unit);
@@ -245,10 +245,10 @@ public interface Game {
          * Waits for at most the given time for the game to end and gets the game.
          *
          * @param timeout the maximum time to wait.
-         * @param unit    the time unit of the timeout argument.
+         * @param unit the time unit of the timeout argument.
          * @return the ended game.
          * @throws InterruptedException if the current thread was interrupted while waiting.
-         * @throws TimeoutException     if the wait timed out.
+         * @throws TimeoutException if the wait timed out.
          */
         Game get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException;
     }
@@ -281,14 +281,14 @@ public interface Game {
          * Requests a choice.
          *
          * @param choiceSet the choice set.
-         * @param side      the side.
+         * @param side the side.
          */
         void requestChoice(ChoiceSet choiceSet, Side side);
 
         /**
          * Ends the game.
          *
-         * @param resultType  the result type of the game.
+         * @param resultType the result type of the game.
          * @param winningSide the winning side.
          */
         void end(Result.Type resultType, Side winningSide);
@@ -296,7 +296,7 @@ public interface Game {
         /**
          * Ends the game.
          *
-         * @param resultType  the result type of the game.
+         * @param resultType the result type of the game.
          * @param winningSide the winning side.
          * @param description the description.
          */

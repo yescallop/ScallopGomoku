@@ -37,7 +37,7 @@ public interface Player extends GameListener {
     /**
      * Requests a choice with specified timeout.
      *
-     * @param choiceSet     the choice set.
+     * @param choiceSet the choice set.
      * @param timeoutMillis timeout in milliseconds, 0 for no timeout.
      * @return the choice requested.
      * @throws InterruptedException if the current thread was interrupted while waiting.
@@ -70,7 +70,7 @@ public interface Player extends GameListener {
      * Called when the opponent makes a choice.
      *
      * @param choiceSet the choice set.
-     * @param choice    the choice made.
+     * @param choice the choice made.
      */
     void opponentChoiceMade(ChoiceSet choiceSet, int choice);
 }

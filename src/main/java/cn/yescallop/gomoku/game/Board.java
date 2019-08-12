@@ -115,7 +115,7 @@ public class Board {
     /**
      * Makes a move.
      *
-     * @param grid  the grid where the move is made.
+     * @param grid the grid where the move is made.
      * @param stone the stone type.
      */
     void move(Grid grid, StoneType stone) {

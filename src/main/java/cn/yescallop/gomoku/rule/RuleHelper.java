@@ -44,7 +44,7 @@ public final class RuleHelper {
      * Calculates the length of the row in the line.
      *
      * @param grid the grid.
-     * @param d    the direction index.
+     * @param d the direction index.
      * @return the length.
      */
     private static int rowLen(Board.Grid grid, int d) {
@@ -160,7 +160,7 @@ public final class RuleHelper {
     /**
      * Searches shapes containing the specified grid.
      *
-     * @param grid    the grid.
+     * @param grid the grid.
      * @param checked the last node of checked grids.
      * @return a list of shapes.
      */
@@ -179,10 +179,10 @@ public final class RuleHelper {
     /**
      * Searches shapes in a line.
      *
-     * @param grid    the grid.
+     * @param grid the grid.
      * @param checked the last node of checked grids.
-     * @param d       the direction index.
-     * @param res     the list of shapes.
+     * @param d the direction index.
+     * @param res the list of shapes.
      */
     private static void lsp(Board.Grid grid, GridNode checked, int d, List<StoneShape> res) {
         int[][] dsp = new int[2][2]; // dsp results
@@ -235,7 +235,7 @@ public final class RuleHelper {
     /**
      * Checks whether there's a forbidden move in the grid.
      *
-     * @param grid    the grid.
+     * @param grid the grid.
      * @param checked the last node of checked grids.
      * @return whether there's a forbidden move.
      */
@@ -254,14 +254,14 @@ public final class RuleHelper {
      * second row and also calculates the length.
      * Between the two rows is one empty grid.
      *
-     * @param grid    the grid, exclusive.
+     * @param grid the grid, exclusive.
      * @param checked the last node of checked grids.
-     * @param d       the direction index.
-     * @param res     an array of length 2 to store the result,
-     *                in which the first element is the length of
-     *                the first row, and the second element
-     *                is the length of the second row (or -1 if no
-     *                empty grid is reached).
+     * @param d the direction index.
+     * @param res an array of length 2 to store the result,
+     * in which the first element is the length of
+     * the first row, and the second element
+     * is the length of the second row (or -1 if no
+     * empty grid is reached).
      * @return true if the shape is open in the direction,
      * or else false.
      */
@@ -310,6 +310,7 @@ public final class RuleHelper {
     }
 
     private static class GridNode {
+
         final Board.Grid value;
         final GridNode prev;
         final int index;
