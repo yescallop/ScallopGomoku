@@ -9,7 +9,7 @@ import cn.yescallop.gomoku.rule.StandardRules;
 /**
  * @author Scallop Ye
  */
-public class Main {
+public class MainTest {
 
     public static void main(String[] args) {
         Game game = Game.newBuilder()
@@ -19,6 +19,6 @@ public class Main {
                 .player(Side.SECOND, new ConsolePlayer("Player 2"))
                 .listener(new ConsoleGameListener())
                 .build();
-        game.start();
+        game.start().thenAccept(g -> System.out.println(g.result()));
     }
 }

@@ -9,10 +9,10 @@ import java.util.concurrent.*;
  *
  * @author Scallop Ye
  */
-class GameThread extends Thread {
+class GameTask implements Runnable {
 
     private final GameImpl game;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "RequestThread"));
 
     private final long[] moveTimeRemaining;
     final long[] gameTimeRemaining;
@@ -22,8 +22,7 @@ class GameThread extends Thread {
 
     private int choiceIndex = 0;
 
-    GameThread(GameImpl game) {
-        super("GameThread");
+    GameTask(GameImpl game) {
         this.game = game;
         moveTimeRemaining = game.moveTimeout == 0 ?
                 null : new long[]{game.moveTimeout, game.moveTimeout};
@@ -62,13 +61,13 @@ class GameThread extends Thread {
             } catch (TimeoutException e) {
                 // Timeout
                 game.controller.end(Result.Type.TIMEOUT, side.opposite());
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // Unexpected exception
                 game.listenerGroup.exceptionCaught(e, null);
                 game.controller.end(Result.Type.EXCEPTION, null);
+                throw e;
             }
         }
-        executor.shutdown();
     }
 
     void multipleMovesRequested(int count) {

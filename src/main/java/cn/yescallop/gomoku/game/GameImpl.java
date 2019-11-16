@@ -7,8 +7,9 @@ import cn.yescallop.gomoku.rule.RuleHelper;
 
 import java.util.List;
 import java.util.OptionalLong;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Implementation of Game.
@@ -29,7 +30,8 @@ class GameImpl implements Game {
     final Controller controller = new ControllerImpl();
     final ListenerGroup listenerGroup;
 
-    private GameThread gameThread;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "GameThread"));
+    private GameTask gameTask;
 
     private boolean started;
     private boolean ended;
@@ -64,7 +66,7 @@ class GameImpl implements Game {
     }
 
     @Override
-    public Game.Future start() {
+    public CompletableFuture<Game> start() {
         if (started || ended)
             throw new IllegalStateException("Illegal start");
         started = true;
@@ -73,10 +75,10 @@ class GameImpl implements Game {
 
         listenerGroup.gameStarted(this);
 
-        gameThread = new GameThread(this);
-        gameThread.start();
+        gameTask = new GameTask(this);
 
-        return new FutureImpl();
+        return CompletableFuture.runAsync(gameTask, executor)
+                .thenApply((Void) -> this);
     }
 
     @Override
@@ -144,8 +146,8 @@ class GameImpl implements Game {
 
     @Override
     public OptionalLong gameTimeRemainingMillis(Side side) {
-        return gameThread.gameTimeRemaining == null ?
-                OptionalLong.empty() : OptionalLong.of(gameThread.gameTimeRemaining[side.ordinal()]);
+        return gameTask.gameTimeRemaining == null ?
+                OptionalLong.empty() : OptionalLong.of(gameTask.gameTimeRemaining[side.ordinal()]);
     }
 
     @Override
@@ -205,33 +207,6 @@ class GameImpl implements Game {
     // Non-static inner class implementations
 
     /**
-     * Implementation of Game.Future.
-     */
-    private class FutureImpl implements Game.Future {
-
-        private FutureImpl() {
-        }
-
-        @Override
-        public void interrupt() {
-            gameThread.interrupt();
-        }
-
-        @Override
-        public Game get() throws InterruptedException {
-            gameThread.join();
-            return GameImpl.this;
-        }
-
-        @Override
-        public Game get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
-            unit.timedJoin(gameThread, timeout);
-            if (gameThread.isAlive()) throw new TimeoutException();
-            return GameImpl.this;
-        }
-    }
-
-    /**
      * Implementation of Game.Controller.
      */
     private class ControllerImpl implements Game.Controller {
@@ -258,7 +233,7 @@ class GameImpl implements Game {
             if (count < 2)
                 throw new IllegalArgumentException("count < 2");
 
-            gameThread.multipleMovesRequested(count);
+            gameTask.multipleMovesRequested(count);
             listenerGroup.multipleMovesRequested(count, currentSide());
         }
 
@@ -282,6 +257,8 @@ class GameImpl implements Game {
             choiceSet = null;
             result = new Result(resultType, winningSide, description);
             listenerGroup.gameEnded(result);
+            gameTask.executor.shutdown();
+            executor.shutdown();
         }
     }
 }

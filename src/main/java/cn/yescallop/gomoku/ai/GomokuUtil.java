@@ -80,11 +80,11 @@ public final class GomokuUtil {
                 res.add(SEMI_OPEN_THREE);
         }
 
-        int[] fwd = new int[]{crl[1] & 0xffff, crl[1] >> 16};
-        int[] bwd = new int[]{crl[3] & 0xffff, crl[3] >> 16};
+        int[] fwd = new int[]{crl[1] & 0xffff, crl[1] >>> 16};
+        int[] bwd = new int[]{crl[3] & 0xffff, crl[3] >>> 16};
 
-        int[] fwdEmpty = new int[]{crl[2] & 0xffff, crl[2] >> 16};
-        int[] bwdEmpty = new int[]{crl[4] & 0xffff, crl[4] >> 16};
+        int[] fwdEmpty = new int[]{crl[2] & 0xffff, crl[2] >>> 16};
+        int[] bwdEmpty = new int[]{crl[4] & 0xffff, crl[4] >>> 16};
 
         int maxEmpty = maxEmpty(central);
         boolean flag = false;

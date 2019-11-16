@@ -35,6 +35,15 @@ public class Result {
         return Optional.ofNullable(description);
     }
 
+    @Override
+    public String toString() {
+        return "Result{" +
+                "type=" + type +
+                ", winningSide=" + winningSide +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
     public enum Type {
         ROW_COMPLETED("A row has been completed"),
         FORBIDDEN_MOVE_MADE("A forbidden move was made"),

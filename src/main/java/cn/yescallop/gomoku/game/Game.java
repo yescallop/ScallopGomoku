@@ -5,8 +5,8 @@ import cn.yescallop.gomoku.player.Player;
 import cn.yescallop.gomoku.rule.Rule;
 
 import java.util.OptionalLong;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * A Game is a game.
@@ -27,9 +27,9 @@ public interface Game {
     /**
      * Starts the game.
      *
-     * @return the future of this game.
+     * @return a CompletableFuture of this game.
      */
-    Future start();
+    CompletableFuture<Game> start();
 
     /**
      * Gets the current side of turn.
@@ -221,36 +221,6 @@ public interface Game {
          * @return a Game.
          */
         Game build();
-    }
-
-    /**
-     * The future of the game.
-     */
-    interface Future {
-
-        /**
-         * Interrupts the game.
-         */
-        void interrupt();
-
-        /**
-         * Waits for the game to end and gets the game.
-         *
-         * @return the ended game.
-         * @throws InterruptedException if the current thread was interrupted while waiting.
-         */
-        Game get() throws InterruptedException;
-
-        /**
-         * Waits for at most the given time for the game to end and gets the game.
-         *
-         * @param timeout the maximum time to wait.
-         * @param unit the time unit of the timeout argument.
-         * @return the ended game.
-         * @throws InterruptedException if the current thread was interrupted while waiting.
-         * @throws TimeoutException if the wait timed out.
-         */
-        Game get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException;
     }
 
     /**
