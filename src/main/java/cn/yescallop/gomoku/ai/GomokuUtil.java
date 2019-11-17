@@ -8,8 +8,7 @@ import cn.yescallop.gomoku.game.StoneType;
 import java.util.LinkedList;
 import java.util.List;
 
-import static cn.yescallop.gomoku.game.StoneShape.FIVE;
-import static cn.yescallop.gomoku.game.StoneShape.SEMI_OPEN_THREE;
+import static cn.yescallop.gomoku.game.StoneShape.*;
 
 /**
  * @author Scallop Ye
@@ -20,12 +19,58 @@ public final class GomokuUtil {
         //no instance
     }
 
-    public static List<StoneShape> searchShapes(Board.Grid grid, StoneType stone, boolean standard) {
+    public static int evaluate(List<StoneShape> list, boolean freestyle) {
+        int res = 0;
+        int fours = 0;
+        int openThrees = 0;
+        for (StoneShape s : list) {
+            switch (s) {
+                case OPEN_FOUR:
+                    return 1000000000;
+                case BROKEN_OVERLINE:
+                    if (freestyle)
+                        s = SEMI_OPEN_FOUR;
+                    else continue;
+                case SEMI_OPEN_FOUR:
+                    fours++;
+                    break;
+                case OPEN_THREE:
+                    openThrees++;
+                    break;
+            }
+            res += evaluate(s);
+        }
+        if (fours >= 2)
+            return 1000000000;
+        if (fours + openThrees >= 2)
+            res *= 10;
+        return res;
+    }
+
+    public static int evaluate(StoneShape s) {
+        switch (s) {
+            case OPEN_FOUR:
+                return 10000000;
+            case SEMI_OPEN_FOUR:
+                return 1000000;
+            case OPEN_THREE:
+                return 5000000;
+            case SEMI_OPEN_THREE:
+                return 100000;
+            case OPEN_TWO:
+                return 10000;
+            case SEMI_OPEN_TWO:
+                return 1000;
+        }
+        return 0;
+    }
+
+    public static List<StoneShape> searchShapes(Board.Grid grid, StoneType stone) {
         assert grid.isEmpty() || grid.stone() == stone;
 
         List<StoneShape> res = new LinkedList<>();
         for (int d = 0; d < 4; d++) {
-            ssl(grid, stone, d, standard, res);
+            ssl(grid, stone, d, res);
         }
         return res;
     }
@@ -36,25 +81,21 @@ public final class GomokuUtil {
      * @param grid the grid.
      * @param stone the stone type.
      * @param d the direction index.
-     * @param standard whether the rule is Standard Gomoku.
      * @param res the list of shapes.
      */
-    private static void ssl(Board.Grid grid, StoneType stone, int d, boolean standard, List<StoneShape> res) {
+    private static void ssl(Board.Grid grid, StoneType stone, int d, List<StoneShape> res) {
         int[] crl = crl(grid, stone, d);
-        if (standard) {
-            sslStandard(crl, res);
-        } else {
-            sslFreestyle(crl, res);
-        }
+        crlToShapes(crl, res);
     }
 
-    private static void sslStandard(int[] crl, List<StoneShape> res) {
+    private static void crlToShapes(int[] crl, List<StoneShape> res) {
         int central = crl[0];
         if (central == 5) {
             res.add(FIVE);
             return;
         }
         if (central > 5) {
+            res.add(OVERLINE);
             return;
         }
 
@@ -98,6 +139,10 @@ public final class GomokuUtil {
                 fwdEmpty = bwdEmpty;
                 bwdEmpty = tmp;
             }
+            if (central + fwd[0] == 5) {
+                res.add(BROKEN_OVERLINE);
+                continue;
+            }
             int total = central;
             int open;
             if (fwd[0] != 0 && fwdEmpty[0] <= maxEmpty) {
@@ -113,10 +158,6 @@ public final class GomokuUtil {
                 flag = true;
             }
         }
-    }
-
-    private static void sslFreestyle(int[] crl, List<StoneShape> res) {
-        //TODO
     }
 
     private static int checkOpen(int total, int emptyBetween,

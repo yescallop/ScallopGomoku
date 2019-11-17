@@ -50,6 +50,7 @@ public class Result {
         TIMEOUT("Timeout"),
         EXCEPTION("Unexpected exception occurred"),
         INTERRUPT("Interrupted"),
+        BOARD_FULL("The board is full"),
         QUIT("Player quitted"),
         DRAW_REQUEST_ACCEPTED("Draw request has been accepted");
 

@@ -41,9 +41,9 @@ public class ConsoleGameListener extends GameListenerAdapter {
         String name = game.playerNameBySide(side);
         StoneType stone = game.stoneTypeBySide(side);
         LOGGER.info("{} ({}) moved: {}", stone, name, move.pointString());
-        StoneShape[] shapes = GomokuUtil.searchShapes(move, stone, true)
-                .toArray(StoneShape[]::new);
-        System.out.println(Arrays.toString(shapes));
+//        StoneShape[] shapes = GomokuUtil.searchShapes(move, stone)
+//                .toArray(StoneShape[]::new);
+//        System.out.println(Arrays.toString(shapes));
     }
 
     @Override

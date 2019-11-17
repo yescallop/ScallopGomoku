@@ -21,9 +21,12 @@ class GameTask implements Runnable {
     private List<Board.Grid> multipleMoves;
 
     private int choiceIndex = 0;
+    private int maxMoveIndex;
 
     GameTask(GameImpl game) {
         this.game = game;
+        int size = game.board().size();
+        maxMoveIndex = size * size;
         moveTimeRemaining = game.moveTimeout == 0 ?
                 null : new long[]{game.moveTimeout, game.moveTimeout};
         gameTimeRemaining = game.gameTimeout == 0 ?
@@ -33,6 +36,10 @@ class GameTask implements Runnable {
     @Override
     public void run() {
         while (!game.isEnded()) {
+            if (game.currentMoveIndex() == maxMoveIndex) {
+                game.controller.end(Result.Type.BOARD_FULL, null);
+                break;
+            }
             Side side = null;
             long startTime = System.currentTimeMillis();
             try {

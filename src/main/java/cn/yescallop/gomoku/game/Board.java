@@ -199,6 +199,11 @@ public class Board {
         }
 
         @Override
+        public int hashCode() {
+            return x << 16 | y;
+        }
+
+        @Override
         public String toString() {
             return "Grid{" + pointString() + ", " + stone + "}";
         }

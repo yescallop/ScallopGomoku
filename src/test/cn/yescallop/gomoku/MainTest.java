@@ -1,5 +1,6 @@
 package cn.yescallop.gomoku;
 
+import cn.yescallop.gomoku.ai.SimpleGomokuAI;
 import cn.yescallop.gomoku.console.ConsoleGameListener;
 import cn.yescallop.gomoku.console.ConsolePlayer;
 import cn.yescallop.gomoku.game.Game;
@@ -15,8 +16,8 @@ public class MainTest {
         Game game = Game.newBuilder()
                 .rule(StandardRules.STANDARD_GOMOKU)
                 .strict(true)
-                .player(Side.FIRST, new ConsolePlayer("Player 1"))
-                .player(Side.SECOND, new ConsolePlayer("Player 2"))
+                .player(Side.FIRST, new SimpleGomokuAI())
+                .player(Side.SECOND, new SimpleGomokuAI())
                 .listener(new ConsoleGameListener())
                 .build();
         game.start().thenAccept(g -> System.out.println(g.result()));
