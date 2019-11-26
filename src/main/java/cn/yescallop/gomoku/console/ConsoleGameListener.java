@@ -1,13 +1,11 @@
 package cn.yescallop.gomoku.console;
 
-import cn.yescallop.gomoku.ai.GomokuUtil;
 import cn.yescallop.gomoku.event.GameListenerAdapter;
 import cn.yescallop.gomoku.game.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.OptionalLong;
 import java.util.concurrent.ExecutionException;
 
@@ -37,13 +35,24 @@ public class ConsoleGameListener extends GameListenerAdapter {
     }
 
     @Override
-    public void moveMade(Board.Grid move, Side side) {
+    public void moveMade(Move move, Side side) {
         String name = game.playerNameBySide(side);
         StoneType stone = game.stoneTypeBySide(side);
-        LOGGER.info("{} ({}) moved: {}", stone, name, move.pointString());
+        if (move.attr().isOfDraw()) {
+            LOGGER.info("{} ({}) moved and offered a draw: {}", stone, name, move.point());
+        } else {
+            LOGGER.info("{} ({}) moved: {}", stone, name, move.point());
+        }
 //        StoneShape[] shapes = GomokuUtil.searchShapes(move, stone)
 //                .toArray(StoneShape[]::new);
 //        System.out.println(Arrays.toString(shapes));
+    }
+
+    @Override
+    public void playerPassed(Side side) {
+        String name = game.playerNameBySide(side);
+        StoneType stone = game.stoneTypeBySide(side);
+        LOGGER.info("{} ({}) passed.", stone, name);
     }
 
     @Override

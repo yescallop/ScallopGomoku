@@ -99,8 +99,13 @@ public class Board {
             if (y < 9) out.print(' ');
             out.print(y + 1);
             for (int x = 0; x < size; x++) {
-                StoneType stone = matrix[y][x].stone;
-                out.print(stone == null ? "  -" : (stone == StoneType.BLACK ? "  X" : "  0"));
+                Grid g = matrix[y][x];
+                StoneType stone = g.stone;
+                if (g.offered) {
+                    out.print("  *");
+                } else {
+                    out.print(stone == null ? "  -" : (stone == StoneType.BLACK ? "  X" : "  0"));
+                }
             }
             out.println();
         }
@@ -150,6 +155,11 @@ public class Board {
          */
         private int moveIndex = 0;
 
+        /**
+         * Whether this grid is offered as part of multiple moves.
+         */
+        boolean offered = false;
+
         private Grid(Board board, int x, int y) {
             this.board = board;
             this.x = x;
@@ -178,6 +188,10 @@ public class Board {
 
         public boolean isEmpty() {
             return stone == null;
+        }
+
+        public boolean isOffered() {
+            return offered;
         }
 
         public int moveIndex() {

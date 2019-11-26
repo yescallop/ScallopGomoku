@@ -22,6 +22,74 @@ public final class RuleHelper {
         // no instance
     }
 
+    public static void processMove(Game.Controller controller,
+                                   Board.Grid grid, Side side) throws IllegalMoveException {
+        switch (controller.game().rule().type()) {
+            case FREESTYLE_GOMOKU:
+                if (!grid.isEmpty())
+                    throw new IllegalMoveException("Moving into an occupied grid");
+                controller.makeMove();
+                if (RuleHelper.longestRowLen(grid) >= 5) {
+                    controller.end(Result.Type.ROW_COMPLETED, side);
+                }
+                break;
+            case STANDARD_GOMOKU:
+                if (!grid.isEmpty())
+                    throw new IllegalMoveException("Moving into an occupied grid");
+                controller.makeMove();
+                if (RuleHelper.longestRowLen(grid) == 5) {
+                    controller.end(Result.Type.ROW_COMPLETED, side);
+                }
+                break;
+            case STANDARD_RENJU:
+                if (!grid.isEmpty()) {
+                    if (grid.stone() == StoneType.BLACK &&
+                            controller.game().currentStoneType() == StoneType.WHITE &&
+                            reportForbiddenMove(controller, grid)) {
+                        return;
+                    }
+                    throw new IllegalMoveException("Moving into an occupied grid");
+                }
+                controller.makeMove();
+                if (grid.stone() == StoneType.WHITE) {
+                    if (RuleHelper.longestRowLen(grid) >= 5) {
+                        controller.end(Result.Type.ROW_COMPLETED, side);
+                    }
+                } else if (controller.game().isStrict()) {
+                    List<StoneShape> shapes = RuleHelper.searchShapes(grid);
+                    if (shapes.contains(StoneShape.FIVE)) {
+                        controller.end(Result.Type.ROW_COMPLETED, side);
+                        return;
+                    }
+                    String description = RuleHelper.describeForbiddenMove(shapes);
+                    if (description != null) {
+                        controller.end(Result.Type.FORBIDDEN_MOVE_MADE, side.opposite(), description);
+                    }
+                } else if (RuleHelper.longestRowLen(grid) == 5) {
+                    controller.end(Result.Type.ROW_COMPLETED, side);
+                }
+                break;
+        }
+    }
+
+    private static boolean reportForbiddenMove(Game.Controller controller, Board.Grid grid) {
+        Game game = controller.game();
+        if (game.rule().type() != Rule.Type.STANDARD_RENJU || game.isStrict())
+            return false;
+        if (grid.moveIndex() == game.currentMoveIndex()) {
+            List<StoneShape> shapes = RuleHelper.searchShapes(grid);
+            String description = RuleHelper.describeForbiddenMove(shapes);
+            if (description != null) {
+                controller.end(Result.Type.FORBIDDEN_MOVE_MADE, game.sideByStoneType(StoneType.WHITE), description);
+                return true;
+            }
+        } else if (RuleHelper.longestRowLen(grid) > 5) {
+            controller.end(Result.Type.FORBIDDEN_MOVE_MADE, game.sideByStoneType(StoneType.WHITE), "Overline");
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Calculates the length of the longest row
      * containing the specified grid.

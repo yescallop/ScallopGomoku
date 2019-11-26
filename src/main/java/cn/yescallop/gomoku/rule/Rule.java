@@ -10,33 +10,33 @@ import java.util.function.Supplier;
 public interface Rule {
 
     /**
-     * Creates a Gomoku rule with the specified name and judge supplier.
+     * Creates a Standard Gomoku rule with the specified name and judge supplier.
      *
      * @param name the name.
-     * @param judgeSupplier the judge supplier.
+     * @param openingSupplier the opening supplier, null for no opening.
      * @return the rule.
      */
-    static Rule createGomoku(String name, Supplier<Judge> judgeSupplier) {
-        return new RuleImpl(name, false, judgeSupplier);
+    static Rule createGomoku(String name, Supplier<Opening> openingSupplier) {
+        return new RuleImpl(name, Type.STANDARD_GOMOKU, openingSupplier);
     }
 
     /**
-     * Creates a Renju rule with the specified name and judge supplier.
+     * Creates a Standard Renju rule with the specified name and judge supplier.
      *
      * @param name the name.
-     * @param judgeSupplier the judge supplier.
+     * @param openingSupplier the opening supplier, null for no opening.
      * @return the rule.
      */
-    static Rule createRenju(String name, Supplier<Judge> judgeSupplier) {
-        return new RuleImpl(name, true, judgeSupplier);
+    static Rule createRenju(String name, Supplier<Opening> openingSupplier) {
+        return new RuleImpl(name, Type.STANDARD_RENJU, openingSupplier);
     }
 
     /**
-     * Constructs a new judge of this rule.
+     * Constructs a new opening instance of this rule.
      *
-     * @return the judge.
+     * @return the opening instance.
      */
-    Judge newJudge();
+    Opening newOpening();
 
     /**
      * Gets the name of the rule.
@@ -46,9 +46,15 @@ public interface Rule {
     String name();
 
     /**
-     * Gets whether the rule is a Renju rule.
+     * Gets the type of the rule.
      *
-     * @return whether the rule is a Renju rule.
+     * @return the type.
      */
-    boolean isRenjuRule();
+    Type type();
+
+    enum Type {
+        FREESTYLE_GOMOKU,
+        STANDARD_GOMOKU,
+        STANDARD_RENJU
+    }
 }

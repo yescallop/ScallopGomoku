@@ -3,6 +3,7 @@ package cn.yescallop.gomoku.console;
 import cn.yescallop.gomoku.game.Board;
 import cn.yescallop.gomoku.game.ChoiceSet;
 import cn.yescallop.gomoku.game.Game;
+import cn.yescallop.gomoku.game.Move;
 import cn.yescallop.gomoku.player.PlayerAdapter;
 
 import java.io.BufferedReader;
@@ -41,20 +42,31 @@ public class ConsolePlayer extends PlayerAdapter {
     }
 
     @Override
-    public void multipleMovesRequested(int count) {
-        System.out.printf("----- MULTIPLE MOVES OF %d REQUESTED -----", count);
-        System.out.println();
-    }
-
-    @Override
-    public Board.Point requestMove(long timeoutMillis) throws Exception {
+    public Move requestMove(Move.Attribute attr, long timeoutMillis) throws Exception {
         game.board().printTo(System.out);
-        System.out.printf("[%s] [%s] Please enter your move: ", name, game.stoneTypeBySide(side));
+        if (attr.isMultiple()) {
+            System.out.printf("[%s] [%s] Please offer your move (%d/%d): ",
+                    name, game.stoneTypeBySide(side),
+                    attr.ordinal(), attr.total());
+        } else {
+            System.out.printf(attr.isOfDraw() ? "[%s] [%s] Please move (! for a draw): " : "[%s] [%s] Please move: ",
+                    name, game.stoneTypeBySide(side));
+        }
+        String line = readLine();
+        boolean draw = false;
+        if (line.charAt(0) == '!') {
+            if (line.length() == 1)
+                return null;
+            line = line.substring(1);
+            draw = true;
+        }
+        Board.Point point;
         try {
-            return Board.Point.parse(readLine());
+            point = Board.Point.parse(line);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Input mismatch");
         }
+        return draw ? Move.ofDraw(point) : Move.of(point);
     }
 
     @Override
@@ -62,7 +74,7 @@ public class ConsolePlayer extends PlayerAdapter {
         System.out.println("----- CHOICE REQUEST -----");
         printChoices(choiceSet);
         System.out.println("--------------------------");
-        System.out.printf("[%s] [%s] Please enter your choice: ", name, game.stoneTypeBySide(side));
+        System.out.printf("[%s] [%s] Please choose: ", name, game.stoneTypeBySide(side));
 
         int choice = Integer.parseInt(readLine());
         if (choiceSet.type() != ChoiceSet.Type.MOVE_COUNT)

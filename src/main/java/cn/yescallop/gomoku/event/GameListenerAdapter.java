@@ -15,22 +15,22 @@ public abstract class GameListenerAdapter implements GameListener {
     }
 
     @Override
-    public void moveRequested(Side side) {
+    public void moveRequested(Move.Attribute attr, Side side) {
 
     }
 
     @Override
-    public void multipleMovesRequested(int count, Side side) {
+    public void moveMade(Move move, Side side) {
 
     }
 
     @Override
-    public void moveMade(Board.Grid move, Side side) {
+    public void playerPassed(Side side) {
 
     }
 
     @Override
-    public void moveOffered(Board.Grid move, Side side) {
+    public void moveOffered(Move move, Side side) {
 
     }
 

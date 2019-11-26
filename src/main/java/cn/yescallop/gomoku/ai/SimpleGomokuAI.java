@@ -5,7 +5,9 @@ import cn.yescallop.gomoku.player.PlayerAdapter;
 import cn.yescallop.gomoku.rule.Rule;
 import cn.yescallop.gomoku.rule.StandardRules;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static cn.yescallop.gomoku.game.StoneShape.FIVE;
 import static cn.yescallop.gomoku.game.StoneShape.OVERLINE;
@@ -39,10 +41,10 @@ public class SimpleGomokuAI extends PlayerAdapter {
     }
 
     @Override
-    public Board.Point requestMove(long timeoutMillis) throws Exception {
+    public Move requestMove(Move.Attribute attr, long timeoutMillis) {
         if (game.currentMoveIndex() == 0) {
             int c = boardSize / 2;
-            return new Board.Point(c, c);
+            return Move.ofPoint(c, c);
         }
         StoneType stone = game.stoneTypeBySide(side);
         List<Board.Grid> moves = new ArrayList<>();
@@ -53,11 +55,11 @@ public class SimpleGomokuAI extends PlayerAdapter {
                 if (grid.isEmpty()) {
                     List<StoneShape> s = GomokuUtil.searchShapes(grid, stone);
                     if (s.contains(FIVE) || (freestyle && s.contains(OVERLINE))) {
-                        return grid.point();
+                        return Move.of(grid);
                     }
                     List<StoneShape> so = GomokuUtil.searchShapes(grid, stone.opposite());
                     if (so.contains(FIVE) || (freestyle && so.contains(OVERLINE))) {
-                        return grid.point();
+                        return Move.of(grid);
                     }
                     int score1 = GomokuUtil.evaluate(s, freestyle);
                     int score2 = GomokuUtil.evaluate(so, freestyle);
@@ -73,7 +75,14 @@ public class SimpleGomokuAI extends PlayerAdapter {
                 }
             }
         }
-        return moves.get(random.nextInt(moves.size())).point();
+        boolean draw = false;
+        if (maxScore == 0) {
+            if (attr.isOfDraw())
+                return null;
+            draw = true;
+        }
+        Board.Grid grid = moves.get(random.nextInt(moves.size()));
+        return draw ? Move.ofDraw(grid) : Move.of(grid);
     }
 
     @Override

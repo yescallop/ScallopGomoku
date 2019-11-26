@@ -51,8 +51,9 @@ public class Result {
         EXCEPTION("Unexpected exception occurred"),
         INTERRUPT("Interrupted"),
         BOARD_FULL("The board is full"),
+        BOTH_PASS("Both players passed"),
         QUIT("Player quitted"),
-        DRAW_REQUEST_ACCEPTED("Draw request has been accepted");
+        DRAW_OFFER_ACCEPTED("Draw offer has been accepted");
 
         private final String message;
 

@@ -19,16 +19,10 @@ public interface GameListener {
     /**
      * Called when a move is requested.
      *
+     * @param attr the attributes of the move.
      * @param side the side requested to move.
      */
-    void moveRequested(Side side);
-
-    /**
-     * Called when multiple moves are requested.
-     *
-     * @param side the side requested to move.
-     */
-    void multipleMovesRequested(int count, Side side);
+    void moveRequested(Move.Attribute attr, Side side);
 
     /**
      * Called when a move is made.
@@ -36,7 +30,14 @@ public interface GameListener {
      * @param move the move.
      * @param side the side.
      */
-    void moveMade(Board.Grid move, Side side);
+    void moveMade(Move move, Side side);
+
+    /**
+     * Called when a player passes.
+     *
+     * @param side the side.
+     */
+    void playerPassed(Side side);
 
     /**
      * Called when a move is offered as part of
@@ -45,7 +46,7 @@ public interface GameListener {
      * @param move the move.
      * @param side the side which offered the move.
      */
-    void moveOffered(Board.Grid move, Side side);
+    void moveOffered(Move move, Side side);
 
     /**
      * Called when a choice is requested.

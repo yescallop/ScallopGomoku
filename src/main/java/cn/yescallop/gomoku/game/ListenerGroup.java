@@ -17,22 +17,22 @@ class ListenerGroup extends HashSet<GameListener> implements GameListener {
     }
 
     @Override
-    public void moveRequested(Side side) {
-        forEach(l -> l.moveRequested(side));
+    public void moveRequested(Move.Attribute move, Side side) {
+        forEach(l -> l.moveRequested(move, side));
     }
 
     @Override
-    public void multipleMovesRequested(int count, Side side) {
-        forEach(l -> l.multipleMovesRequested(count, side));
-    }
-
-    @Override
-    public void moveMade(Board.Grid move, Side side) {
+    public void moveMade(Move move, Side side) {
         forEach(l -> l.moveMade(move, side));
     }
 
     @Override
-    public void moveOffered(Board.Grid move, Side side) {
+    public void playerPassed(Side side) {
+        forEach(l -> l.playerPassed(side));
+    }
+
+    @Override
+    public void moveOffered(Move move, Side side) {
         forEach(l -> l.moveOffered(move, side));
     }
 

@@ -1,8 +1,8 @@
 package cn.yescallop.gomoku.player;
 
 import cn.yescallop.gomoku.event.GameListener;
-import cn.yescallop.gomoku.game.Board;
 import cn.yescallop.gomoku.game.ChoiceSet;
+import cn.yescallop.gomoku.game.Move;
 import cn.yescallop.gomoku.game.Side;
 
 /**
@@ -28,11 +28,12 @@ public interface Player extends GameListener {
     /**
      * Requests a move with specified timeout.
      *
+     * @param attr attributes of the move.
      * @param timeoutMillis timeout in milliseconds, 0 for no timeout.
      * @return the move requested.
      * @throws InterruptedException if the current thread was interrupted while waiting.
      */
-    Board.Point requestMove(long timeoutMillis) throws Exception;
+    Move requestMove(Move.Attribute attr, long timeoutMillis) throws Exception;
 
     /**
      * Requests a choice with specified timeout.
@@ -45,18 +46,16 @@ public interface Player extends GameListener {
     int requestChoice(ChoiceSet choiceSet, long timeoutMillis) throws Exception;
 
     /**
-     * Called when multiple moves are requested.
-     *
-     * @param count the count of moves requested.
-     */
-    void multipleMovesRequested(int count);
-
-    /**
      * Called when the opponent makes a move.
      *
      * @param move the move made.
      */
-    void opponentMoveMade(Board.Grid move);
+    void opponentMoveMade(Move move);
+
+    /**
+     * Called when the opponent passes.
+     */
+    void opponentPassed();
 
     /**
      * Called when the opponent offers a move
@@ -64,7 +63,7 @@ public interface Player extends GameListener {
      *
      * @param move the move.
      */
-    void opponentMoveOffered(Board.Grid move);
+    void opponentMoveOffered(Move move);
 
     /**
      * Called when the opponent makes a choice.

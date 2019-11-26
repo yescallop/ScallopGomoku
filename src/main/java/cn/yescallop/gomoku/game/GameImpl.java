@@ -1,11 +1,9 @@
 package cn.yescallop.gomoku.game;
 
 import cn.yescallop.gomoku.player.Player;
-import cn.yescallop.gomoku.rule.Judge;
+import cn.yescallop.gomoku.rule.Opening;
 import cn.yescallop.gomoku.rule.Rule;
-import cn.yescallop.gomoku.rule.RuleHelper;
 
-import java.util.List;
 import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -26,7 +24,7 @@ class GameImpl implements Game {
     final long gameTimeout;
     final long moveTimeout;
 
-    final Judge judge;
+    final Opening opening;
     final Controller controller = new ControllerImpl();
     final ListenerGroup listenerGroup;
 
@@ -36,6 +34,7 @@ class GameImpl implements Game {
     private boolean started;
     private boolean ended;
     private boolean swapped = false;
+    private boolean inOpening;
 
     private Side sideAwaitingChoice = null;
     private ChoiceSet choiceSet = null;
@@ -46,7 +45,8 @@ class GameImpl implements Game {
 
     GameImpl(GameBuilderImpl builder) {
         this.rule = builder.rule;
-        this.judge = rule.newJudge();
+        this.opening = rule.newOpening();
+        inOpening = opening != null;
 
         this.players = builder.players;
         // Sets the sides of the players
@@ -70,8 +70,6 @@ class GameImpl implements Game {
         if (started || ended)
             throw new IllegalStateException("Illegal start");
         started = true;
-
-        judge.gameStarted(this, controller);
 
         listenerGroup.gameStarted(this);
 
@@ -111,27 +109,6 @@ class GameImpl implements Game {
     @Override
     public Board board() {
         return board;
-    }
-
-    @Override
-    public boolean reportForbiddenMove(Board.Point point) {
-        if (!started || !rule.isRenjuRule() || strict)
-            return false;
-        Board.Grid grid = board.getGrid(point);
-        if (grid.stone() != StoneType.BLACK)
-            return false;
-        if (grid.moveIndex() == board.currentMoveIndex()) {
-            List<StoneShape> shapes = RuleHelper.searchShapes(grid);
-            String description = RuleHelper.describeForbiddenMove(shapes);
-            if (description != null) {
-                controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE), description);
-                return true;
-            }
-        } else if (RuleHelper.longestRowLen(grid) > 5) {
-            controller.end(Result.Type.FORBIDDEN_MOVE_MADE, sideByStoneType(StoneType.WHITE), "Overline");
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -185,6 +162,11 @@ class GameImpl implements Game {
         return swapped;
     }
 
+    @Override
+    public boolean isInOpening() {
+        return inOpening;
+    }
+
     // Package-private methods
 
     Player player(Side side) {
@@ -204,15 +186,43 @@ class GameImpl implements Game {
         choiceSet = null;
     }
 
+    void switchStoneType() {
+        currentStoneType = currentStoneType.opposite();
+    }
+
     // Non-static inner class implementations
 
     /**
      * Implementation of Game.Controller.
      */
-    private class ControllerImpl implements Game.Controller {
+    class ControllerImpl implements Game.Controller {
+
+        private Move move;
+        private Board.Grid grid;
 
         private ControllerImpl() {
             // private access
+        }
+
+        void makeMove(Board.Grid grid) {
+            board.move(grid, currentStoneType);
+            listenerGroup.moveMade(Move.of(grid), currentSide());
+            switchStoneType();
+        }
+
+        void cacheMove(Move move, Board.Grid grid) {
+            this.move = move;
+            this.grid = grid;
+        }
+
+        @Override
+        public Game game() {
+            return GameImpl.this;
+        }
+
+        @Override
+        public void endOpening() {
+            inOpening = false;
         }
 
         @Override
@@ -222,10 +232,12 @@ class GameImpl implements Game {
         }
 
         @Override
-        public void makeMove(Board.Grid grid) {
+        public void makeMove() {
             board.move(grid, currentStoneType);
-            listenerGroup.moveMade(grid, currentSide());
-            currentStoneType = currentStoneType.opposite();
+            listenerGroup.moveMade(move, currentSide());
+            switchStoneType();
+            move = null;
+            grid = null;
         }
 
         @Override
@@ -234,7 +246,6 @@ class GameImpl implements Game {
                 throw new IllegalArgumentException("count < 2");
 
             gameTask.multipleMovesRequested(count);
-            listenerGroup.multipleMovesRequested(count, currentSide());
         }
 
         @Override

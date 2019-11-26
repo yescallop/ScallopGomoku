@@ -1,6 +1,7 @@
 package cn.yescallop.gomoku.rule.standard;
 
 import cn.yescallop.gomoku.game.*;
+import cn.yescallop.gomoku.rule.Opening;
 import cn.yescallop.gomoku.rule.RuleHelper;
 
 /**
@@ -8,14 +9,11 @@ import cn.yescallop.gomoku.rule.RuleHelper;
  *
  * @author Scallop Ye
  */
-public class Tarannikov extends StandardRenju {
+public class Tarannikov implements Opening {
 
     @Override
-    public void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException {
-        if (index > 5) {
-            super.processMove(index, grid, side);
-            return;
-        }
+    public void processMove(Game.Controller controller,
+                            int index, Board.Grid grid, Side side) throws IllegalMoveException {
         int dist = RuleHelper.chebyshevDistToCenter(grid);
         switch (index) {
             case 1:
@@ -37,17 +35,18 @@ public class Tarannikov extends StandardRenju {
             case 5:
                 if (dist > 4)
                     throw new IllegalMoveException("The fifth move outside central 9x9 area");
+                controller.endOpening();
                 break;
         }
-        controller.makeMove(grid);
+        controller.makeMove();
         controller.requestChoice(
                 ChoiceSet.ofStrings("Choose Black", "Choose White"),
                 side.opposite());
     }
 
     @Override
-    public void processChoice(int index, int choice, Side side) {
-        if ((choice == 0) ^ (game.stoneTypeBySide(side) == StoneType.BLACK)) {
+    public void processChoice(Game.Controller controller, int index, int choice, Side side) {
+        if ((choice == 0) ^ (controller.game().stoneTypeBySide(side) == StoneType.BLACK)) {
             controller.swap();
         }
     }

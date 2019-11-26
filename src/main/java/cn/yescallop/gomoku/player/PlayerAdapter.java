@@ -14,17 +14,17 @@ public abstract class PlayerAdapter extends AbstractPlayer {
     }
 
     @Override
-    public void multipleMovesRequested(int count) {
+    public void opponentMoveMade(Move move) {
 
     }
 
     @Override
-    public void opponentMoveMade(Board.Grid move) {
+    public void opponentPassed() {
 
     }
 
     @Override
-    public void opponentMoveOffered(Board.Grid move) {
+    public void opponentMoveOffered(Move move) {
 
     }
 

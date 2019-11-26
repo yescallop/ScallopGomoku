@@ -1,9 +1,7 @@
 package cn.yescallop.gomoku.rule.standard;
 
-import cn.yescallop.gomoku.game.Board;
-import cn.yescallop.gomoku.game.ChoiceSet;
-import cn.yescallop.gomoku.game.IllegalMoveException;
-import cn.yescallop.gomoku.game.Side;
+import cn.yescallop.gomoku.game.*;
+import cn.yescallop.gomoku.rule.Opening;
 import cn.yescallop.gomoku.rule.RuleHelper;
 
 /**
@@ -11,30 +9,28 @@ import cn.yescallop.gomoku.rule.RuleHelper;
  *
  * @author Scallop Ye
  */
-public class Yamaguchi extends StandardRenju {
+public class Yamaguchi implements Opening {
 
     private int moveCount;
 
     @Override
-    public void processMove(int index, Board.Grid grid, Side side) throws IllegalMoveException {
-        if (index > 4) {
-            super.processMove(index, grid, side);
-            return;
-        }
+    public void processMove(Game.Controller controller,
+                            int index, Board.Grid grid, Side side) throws IllegalMoveException {
         RuleHelper.validateStandardOpening(grid, index);
-        controller.makeMove(grid);
+        controller.makeMove();
 
         if (index < 3) {
             controller.swap();
         } else if (index == 3) {
-            controller.requestChoice(ChoiceSet.ofMaxMoveCount(game.board()), side);
+            controller.requestChoice(ChoiceSet.ofMaxMoveCount(controller.game().board()), side);
         } else {
             controller.requestMultipleMoves(moveCount);
+            controller.endOpening();
         }
     }
 
     @Override
-    public void processChoice(int index, int choice, Side side) {
+    public void processChoice(Game.Controller controller, int index, int choice, Side side) {
         if (index == 1) {
             moveCount = choice;
             controller.requestChoice(

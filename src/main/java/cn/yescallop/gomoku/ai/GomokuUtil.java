@@ -22,11 +22,14 @@ public final class GomokuUtil {
     public static int evaluate(List<StoneShape> list, boolean freestyle) {
         int res = 0;
         int fours = 0;
+        boolean openFour = false;
         int openThrees = 0;
         for (StoneShape s : list) {
             switch (s) {
                 case OPEN_FOUR:
-                    return 1000000000;
+                    res += 1000000000;
+                    openFour = true;
+                    continue;
                 case BROKEN_OVERLINE:
                     if (freestyle)
                         s = SEMI_OPEN_FOUR;
@@ -40,6 +43,8 @@ public final class GomokuUtil {
             }
             res += evaluate(s);
         }
+        if (openFour)
+            return res;
         if (fours >= 2)
             return 1000000000;
         if (fours + openThrees >= 2)
@@ -49,12 +54,10 @@ public final class GomokuUtil {
 
     public static int evaluate(StoneShape s) {
         switch (s) {
-            case OPEN_FOUR:
-                return 10000000;
             case SEMI_OPEN_FOUR:
-                return 1000000;
-            case OPEN_THREE:
                 return 5000000;
+            case OPEN_THREE:
+                return 4000000;
             case SEMI_OPEN_THREE:
                 return 100000;
             case OPEN_TWO:

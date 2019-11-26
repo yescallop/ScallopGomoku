@@ -77,19 +77,6 @@ public interface Game {
     Board board();
 
     /**
-     * Reports a forbidden move of Black.
-     * If the report succeeds, the game will end with
-     * White as the winner.
-     * <p>
-     * It is not recommended to report yourself.
-     *
-     * @param point the point where the move was made,
-     * or the point where there's an overline.
-     * @return true if the report succeeded, or else false.
-     */
-    boolean reportForbiddenMove(Board.Point point);
-
-    /**
      * Gets the game timeout.
      *
      * @return the game timeout in milliseconds.
@@ -154,6 +141,11 @@ public interface Game {
      * Tells whether the stones are swapped.
      */
     boolean isSwapped();
+
+    /**
+     * Tells whether the game is in the opening process.
+     */
+    boolean isInOpening();
 
     /**
      * A builder of Game.
@@ -229,16 +221,26 @@ public interface Game {
     interface Controller {
 
         /**
+         * Return the game of this controller.
+         *
+         * @return the game.
+         */
+        Game game();
+
+        /**
+         * Ends the opening process.
+         */
+        void endOpening();
+
+        /**
          * Swaps control of the stones.
          */
         void swap();
 
         /**
-         * Makes a move.
-         *
-         * @param grid the grid where the move is made.
+         * Makes the cached move.
          */
-        void makeMove(Board.Grid grid);
+        void makeMove();
 
         /**
          * Requests multiple moves.

@@ -8,18 +8,18 @@ import java.util.function.Supplier;
 class RuleImpl implements Rule {
 
     private final String name;
-    private final boolean renju;
-    private final Supplier<Judge> judgeSupplier;
+    private final Type type;
+    private final Supplier<Opening> openingSupplier;
 
-    RuleImpl(String name, boolean renju, Supplier<Judge> judgeSupplier) {
+    RuleImpl(String name, Type type, Supplier<Opening> openingSupplier) {
         this.name = name;
-        this.renju = renju;
-        this.judgeSupplier = judgeSupplier;
+        this.type = type;
+        this.openingSupplier = openingSupplier;
     }
 
     @Override
-    public Judge newJudge() {
-        return judgeSupplier.get();
+    public Opening newOpening() {
+        return openingSupplier == null ? null : openingSupplier.get();
     }
 
     @Override
@@ -28,7 +28,7 @@ class RuleImpl implements Rule {
     }
 
     @Override
-    public boolean isRenjuRule() {
-        return renju;
+    public Type type() {
+        return type;
     }
 }

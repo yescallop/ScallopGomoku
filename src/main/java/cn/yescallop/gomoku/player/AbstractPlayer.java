@@ -1,7 +1,7 @@
 package cn.yescallop.gomoku.player;
 
-import cn.yescallop.gomoku.game.Board;
 import cn.yescallop.gomoku.game.ChoiceSet;
+import cn.yescallop.gomoku.game.Move;
 import cn.yescallop.gomoku.game.Side;
 
 import java.util.Objects;
@@ -34,19 +34,13 @@ public abstract class AbstractPlayer implements Player {
         } else throw new IllegalStateException("Side already set");
     }
 
-    public abstract Board.Point requestMove(long timeoutMillis) throws Exception;
+    public abstract Move requestMove(Move.Attribute attr, long timeoutMillis) throws Exception;
 
     public abstract int requestChoice(ChoiceSet choiceSet, long timeoutMillis) throws Exception;
 
     @Override
-    public final void moveRequested(Side side) {
+    public final void moveRequested(Move.Attribute attr, Side side) {
         //ignored
-    }
-
-    @Override
-    public final void multipleMovesRequested(int count, Side side) {
-        if (side == this.side)
-            multipleMovesRequested(count);
     }
 
     @Override
@@ -55,13 +49,19 @@ public abstract class AbstractPlayer implements Player {
     }
 
     @Override
-    public final void moveMade(Board.Grid move, Side side) {
+    public final void moveMade(Move move, Side side) {
         if (side != this.side)
             opponentMoveMade(move);
     }
 
     @Override
-    public final void moveOffered(Board.Grid move, Side side) {
+    public void playerPassed(Side side) {
+        if (side != this.side)
+            opponentPassed();
+    }
+
+    @Override
+    public final void moveOffered(Move move, Side side) {
         if (side != this.side)
             opponentMoveOffered(move);
     }
